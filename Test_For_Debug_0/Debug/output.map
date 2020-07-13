@@ -5191,7 +5191,7 @@ OUTPUT(Test_For_Debug_0.elf elf32-littlearm)
  .debug_line    0x000000000000a11d      0x890 Src/system_stm32h7xx.o
  .debug_line    0x000000000000a9ad       0x7e startup/startup_stm32h743xx.o
 
-.debug_str      0x0000000000000000   0x1598fc
+.debug_str      0x0000000000000000   0x1598b6
  .debug_str     0x0000000000000000   0x150269 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.o
                                      0x150956 (size before relaxing)
  .debug_str     0x0000000000150269      0x46b Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.o
@@ -5218,12 +5218,12 @@ OUTPUT(Test_For_Debug_0.elf elf32-littlearm)
                                      0x15046d (size before relaxing)
  .debug_str     0x0000000000157202      0x2a4 Src/stm32h7xx_nucleo_144.o
                                      0x150a9c (size before relaxing)
- .debug_str     0x00000000001574a6     0x23cf Src/syscalls.o
-                                       0x8613 (size before relaxing)
- .debug_str     0x0000000000159875       0x58 Src/system_stm32h7xx.o
+ .debug_str     0x00000000001574a6     0x2389 Src/syscalls.o
+                                       0x8624 (size before relaxing)
+ .debug_str     0x000000000015982f       0x58 Src/system_stm32h7xx.o
                                      0x14f933 (size before relaxing)
- .debug_str     0x00000000001598cd       0x2f startup/startup_stm32h743xx.o
-                                         0x75 (size before relaxing)
+ .debug_str     0x0000000000159887       0x2f startup/startup_stm32h743xx.o
+                                         0x86 (size before relaxing)
 
 .comment        0x0000000000000000       0x7f
  .comment       0x0000000000000000       0x7f Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.o

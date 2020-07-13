@@ -123,7 +123,9 @@ int main(void)
 		int a = 0;
 	}
   /* USER CODE END 2 */
+
 // code changed
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	while (BSP_PB_GetState(BUTTON_USER) != KEY_NOT_PRESSED)

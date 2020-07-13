@@ -1,0 +1,291 @@
+/*
+ * FDCAN.cpp
+ *
+ *  Created on: Jul 2, 2020
+ *      Author: tequilajohn
+ */
+#include "FDCAN.h"
+#include "main.h"
+#include <string.h> // for memset
+//#include "stm32h7xx_hal.h"
+FDCAN::hardware_resource_t * FDCAN::resFDCAN1 = 0;
+
+/* Initializing function */
+FDCAN::FDCAN(void)
+{
+	InitPeripheral();
+	ConfigurePeripheral();
+	_waitingForReply = false;
+}
+
+FDCAN::~FDCAN()
+{
+	if (!_hRes) return;
+
+	_hRes->instances--;
+	if (_hRes->instances == 0) { // deinitialize port and peripherals
+		DeInitiPeripheral();
+
+		// Delete hardware resource
+		port_t tmpPort = _hRes->port;
+//		delete _hRes; TK shit
+
+		switch (tmpPort)
+		{
+			case PORT_FDCAN1:
+				resFDCAN1 = 0;
+				break;
+			default:
+//				ERROR("Undefined FDCAN port");
+				return;
+		}
+
+	}
+}
+
+void FDCAN::DeInitiPeripheral()
+{
+	if (!_hRes) return;
+	if (_hRes->port == PORT_FDCAN1) {
+		/* Peripheral clock disable */
+		__HAL_RCC_FDCAN_CLK_DISABLE();
+		/* Deinitialize port */
+		/**FDCAN GPIO Configuration
+				PD1     ------> FDCAN1_TX
+				PD0     ------> FDCAN1_RX
+		 */
+		HAL_GPIO_DeInit(FDCAN1_TX_GPIO_Port, FDCAN1_RX_Pin|FDCAN1_TX_Pin);
+		/* Deactivate interruptions*/
+
+	    HAL_NVIC_DisableIRQ(FDCAN1_IT0_IRQn);
+	}
+}
+
+void FDCAN::InitPeripheral()
+{
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
+	port_t port = PORT_FDCAN1;
+	bool firstTime = false;
+	if (!resFDCAN1) {
+		resFDCAN1 = new FDCAN::hardware_resource_t;
+		memset(resFDCAN1, 0, sizeof(FDCAN::hardware_resource_t));
+		firstTime = true;
+	}
+	if (firstTime) { // first time configuring peripheral
+		_hRes->port = port;
+		_hRes->configured = false;
+		_hRes->instances = 0;
+		/* Real time stuff to add later
+		if (_hRes->resourceSemaphore == NULL) {
+			_hRes = 0;
+			ERROR("Could not create I2C resource semaphore");
+			return;
+		}
+		vQueueAddToRegistry(_hRes->resourceSemaphore, "I2C Resource");
+		xSemaphoreGive( _hRes->resourceSemaphore ); // give the semaphore the first time
+		_hRes->transmissionFinished = xSemaphoreCreateBinary();
+		if (_hRes->transmissionFinished == NULL) {
+			_hRes = 0;
+			ERROR("Could not create I2C transmission semaphore");
+			return;
+		}
+		vQueueAddToRegistry(_hRes->transmissionFinished, "I2C Finish");
+		xSemaphoreGive( _hRes->transmissionFinished ); // ensure that the semaphore is not taken from the beginning
+		xSemaphoreTake( _hRes->transmissionFinished, ( TickType_t ) portMAX_DELAY ); // ensure that the semaphore is not taken from the beginning
+		*/
+		// COnfigure pins for I2C accordingly
+		if (port == PORT_FDCAN1) {
+			__HAL_RCC_GPIOD_CLK_ENABLE();
+			/**FDCAN GPIO Configuration
+							PD1     ------> FDCAN1_TX
+							PD0     ------> FDCAN1_RX
+			 */
+			GPIO_InitStruct.Pin = FDCAN1_RX_Pin|FDCAN1_TX_Pin;
+			GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+			GPIO_InitStruct.Pull = GPIO_NOPULL;
+			GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+			GPIO_InitStruct.Alternate = GPIO_AF9_FDCAN1;
+			HAL_GPIO_Init(FDCAN1_TX_GPIO_Port, &GPIO_InitStruct);
+
+			/* Peripheral clock enable*/
+			__HAL_RCC_FDCAN_CLK_ENABLE();
+
+			/* NVIC for FDCAN */
+			HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, 0, 0);
+			HAL_NVIC_EnableIRQ(FDCAN1_IT0_IRQn);
+		}
+	}
+	_hRes->instances++;
+//	TxHeader.Identifier = 0x321;
+	TxHeader.IdType = FDCAN_STANDARD_ID;
+	TxHeader.TxFrameType = FDCAN_DATA_FRAME;
+//	TxHeader.DataLength = FDCAN_DLC_BYTES_3;
+	TxHeader.ErrorStateIndicator = FDCAN_ESI_ACTIVE;
+	TxHeader.BitRateSwitch = FDCAN_BRS_OFF;
+	TxHeader.FDFormat = FDCAN_CLASSIC_CAN;
+	TxHeader.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
+	TxHeader.MessageMarker = 0;
+}
+void FDCAN::ConfigurePeripheral()
+{
+
+	if (!_hRes->configured) { // only configured peripheral once
+		switch (_hRes->port) {
+			case PORT_FDCAN1:
+				_hRes->handle.Instance = FDCAN1;
+				break;
+			default:
+				return;
+		}
+		_hRes->handle.Init.FrameFormat = FDCAN_FRAME_CLASSIC;
+		_hRes->handle.Init.Mode = FDCAN_MODE_NORMAL;
+		_hRes->handle.Init.AutoRetransmission = DISABLE;
+		_hRes->handle.Init.TransmitPause = DISABLE;
+		_hRes->handle.Init.ProtocolException = DISABLE;
+		_hRes->handle.Init.NominalPrescaler = 4;
+		_hRes->handle.Init.NominalSyncJumpWidth = 1;
+		_hRes->handle.Init.NominalTimeSeg1 = 13;
+		_hRes->handle.Init.NominalTimeSeg2 = 2;
+		_hRes->handle.Init.DataPrescaler = 1;
+		_hRes->handle.Init.DataSyncJumpWidth = 1;
+		_hRes->handle.Init.DataTimeSeg1 = 1;
+		_hRes->handle.Init.DataTimeSeg2 = 1;
+		_hRes->handle.Init.MessageRAMOffset = 0;
+		_hRes->handle.Init.StdFiltersNbr = 0;
+		_hRes->handle.Init.ExtFiltersNbr = 0;
+		_hRes->handle.Init.RxFifo0ElmtsNbr = 2;
+		_hRes->handle.Init.RxFifo0ElmtSize = FDCAN_DATA_BYTES_8;
+		_hRes->handle.Init.RxFifo1ElmtsNbr = 0;
+		_hRes->handle.Init.RxFifo1ElmtSize = FDCAN_DATA_BYTES_8;
+		_hRes->handle.Init.RxBuffersNbr = 0;
+		_hRes->handle.Init.RxBufferSize = FDCAN_DATA_BYTES_8;
+		_hRes->handle.Init.TxEventsNbr = 0;
+		_hRes->handle.Init.TxBuffersNbr = 0;
+		_hRes->handle.Init.TxFifoQueueElmtsNbr = 1;
+		_hRes->handle.Init.TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
+		_hRes->handle.Init.TxElmtSize = FDCAN_DATA_BYTES_8;
+
+		FDCAN_FilterTypeDef sFilterConfig;
+		/* Configure Rx filter */
+		sFilterConfig.IdType = FDCAN_STANDARD_ID;
+		sFilterConfig.FilterIndex = 0;
+		sFilterConfig.FilterType = FDCAN_FILTER_MASK;
+		sFilterConfig.FilterConfig = FDCAN_FILTER_TO_RXFIFO0;
+		sFilterConfig.FilterConfig = FDCAN_FILTER_TO_RXBUFFER;
+
+		sFilterConfig.FilterConfig = FDCAN_FILTER_DISABLE;
+
+		sFilterConfig.FilterID1 = 0x701;
+		sFilterConfig.FilterID2 = 0x7FF;
+		if (HAL_FDCAN_Init(&_hRes->handle) != HAL_OK)
+		{
+			Error_Handler();
+		}
+		/* USER CODE BEGIN FDCAN1_Init 2 */
+		if (HAL_FDCAN_ConfigFilter(&_hRes->handle, &sFilterConfig) != HAL_OK)
+		{
+			/* Filter configuration Error */
+			Error_Handler();
+		}
+		if (HAL_FDCAN_ActivateNotification(&_hRes->handle, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK)
+		{
+			/* Notification Error */
+			Error_Handler();
+		}
+		/* START THE CAN MODULE */
+		if (HAL_FDCAN_Start(&_hRes->handle) != HAL_OK)
+		{
+			/* Start Error */
+			Error_Handler();
+		}
+	}
+	if (!_hRes) return; /* only here works */
+
+}
+
+void FDCAN::WriteDummyData(uint8_t data)
+{
+	TxHeader.Identifier = 0x321;
+	TxHeader.DataLength = FDCAN_DLC_BYTES_3;
+	TxHeader.DataLength = FDCAN_DLC_BYTES_8;
+	TxData[0] = 0x08;
+	TxData[1] = 0xAD;
+	TxData[2] = data;
+
+	if(HAL_FDCAN_AddMessageToTxFifoQ(&_hRes->handle, &TxHeader, TxData) != HAL_OK)
+	{
+		TxData[1] = 0x2;
+		/*Transmission request Error*/
+		Error_Handler();
+	}
+}
+void FDCAN::WriteMessage(uint32_t  id, uint8_t len, uint8_t d0, uint8_t d1,
+		uint8_t d2, uint8_t d3, uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7)
+{
+	TxHeader.Identifier = id;
+	/* The length is cap by CAN Classic frame up to 8 bytes*/
+	switch (len){
+	case 0:
+		TxHeader.DataLength = FDCAN_DLC_BYTES_0;
+		break;
+	case 1:
+		TxHeader.DataLength = FDCAN_DLC_BYTES_1;
+		break;
+	case 2:
+		TxHeader.DataLength = FDCAN_DLC_BYTES_2;
+		break;
+	case 3:
+		TxHeader.DataLength = FDCAN_DLC_BYTES_3;
+		break;
+	case 4:
+		TxHeader.DataLength = FDCAN_DLC_BYTES_4;
+		break;
+	case 5:
+		TxHeader.DataLength = FDCAN_DLC_BYTES_5;
+		break;
+	case 6:
+		TxHeader.DataLength = FDCAN_DLC_BYTES_6;
+		break;
+	case 7:
+		TxHeader.DataLength = FDCAN_DLC_BYTES_7;
+		break;
+	case 8:
+		TxHeader.DataLength = FDCAN_DLC_BYTES_8;
+		break;
+		default:
+		TxHeader.DataLength = FDCAN_DLC_BYTES_0;
+	}
+	TxData[0] =  d0;
+	TxData[1] =  d1;
+	TxData[2] =  d2;
+	TxData[3] =  d3;
+	TxData[4] =  d4;
+	TxData[5] =  d5;
+	TxData[6] =  d6;
+	TxData[7] =  d7;
+	if(HAL_FDCAN_AddMessageToTxFifoQ(&_hRes->handle, &TxHeader, TxData) != HAL_OK)
+	{
+		TxData[1] = 0x2;
+		/*Transmission request Error*/
+		Error_Handler();
+	}
+//	FDCAN_RxHeaderTypeDef RxHeader;
+//	uint8_t RxData[8];
+	/*
+	HAL_FDCAN_GetRxMessage(&_hRes->handle, FDCAN_RX_FIFO0, &RxHeader, RxData);
+
+	if (HAL_FDCAN_GetRxFifoFillLevel(&_hRes->handle, FDCAN_RX_FIFO0) > 0) {
+
+		/* Retrieve Rx messages from RX FIFO0 */
+/*		HAL_FDCAN_GetRxMessage(&_hRes->handle, FDCAN_RX_FIFO0, &RxHeader, RxData);
+		HAL_FDCAN_GetRxMessage(&_hRes->handle, FDCAN_RX_FIFO0, &RxHeader, &RxData[8]);
+	}
+*/
+}
+
+void FDCAN1_IT0_IRQHandler(void)
+{
+	if (FDCAN::resFDCAN1)
+		HAL_FDCAN_IRQHandler(&FDCAN::resFDCAN1->handle);
+}
+

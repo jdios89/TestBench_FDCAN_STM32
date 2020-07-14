@@ -20,7 +20,7 @@ class FDCAN
 			PORT_FDCAN1
 		} port_t;
 	public:
-		int a;
+		static uint8_t RX_test[8];
 		FDCAN(); // use the default FDCAN port defined in the IO map in STM32CubeMX
 		~FDCAN();
 		void InitPeripheral();
@@ -34,6 +34,9 @@ class FDCAN
 		void ReadRequestFromRegister(uint8_t index, uint8_t subindex, uint8_t data);
 		void WriteToRegister(uint8_t index, uint8_t subindex, uint8_t data);
 	    void Read(uint8_t index, uint8_t subindex, uint32_t * buffer);
+	    void Read(FDCAN_RxHeaderTypeDef *pRxHeader, uint8_t *pRxData);
+	    void Read();
+	    static void MessageCallback(FDCAN_HandleTypeDef *hfdcan);
 		uint8_t Read(uint8_t index);
 	public:
 		typedef struct hardware_resource_t {
@@ -49,7 +52,9 @@ class FDCAN
 			FDCAN_TxHeaderTypeDef TxHeader;
 			uint8_t TxData[8];
 			int b;
+		public:
 			hardware_resource_t * _hRes;
+		private:
 			GPIO_TypeDef * _fdcanPort;
 			bool _waitingForReply;
 

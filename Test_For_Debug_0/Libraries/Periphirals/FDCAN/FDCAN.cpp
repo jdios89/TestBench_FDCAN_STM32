@@ -10,6 +10,16 @@
 //#include "stm32h7xx_hal.h"
 FDCAN::hardware_resource_t * FDCAN::resFDCAN1 = 0;
 
+
+// Necessary to export for compiler to generate code to be called by the interrupt vector
+extern "C" __EXPORT void FDCAN1_IT0_IRQHandler(void);
+extern "C" __EXPORT void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs);
+extern "C" __EXPORT void HAL_FDCAN_RxBufferNewMessageCallback(FDCAN_HandleTypeDef *hfdcan);
+extern "C" __EXPORT void HAL_FDCAN_TxFifoEmptyCallback(FDCAN_HandleTypeDef *hfdcan);
+extern "C" __EXPORT void HAL_FDCAN_TxBufferCompleteCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t BufferIndexes);
+
+/* Initalize shit  */
+uint8_t FDCAN::RX_test[8];
 /* Initializing function */
 FDCAN::FDCAN(void)
 {
@@ -153,7 +163,7 @@ void FDCAN::ConfigurePeripheral()
 		_hRes->handle.Init.MessageRAMOffset = 0;
 		_hRes->handle.Init.StdFiltersNbr = 0;
 		_hRes->handle.Init.ExtFiltersNbr = 0;
-		_hRes->handle.Init.RxFifo0ElmtsNbr = 2;
+		_hRes->handle.Init.RxFifo0ElmtsNbr = 8;
 		_hRes->handle.Init.RxFifo0ElmtSize = FDCAN_DATA_BYTES_8;
 		_hRes->handle.Init.RxFifo1ElmtsNbr = 0;
 		_hRes->handle.Init.RxFifo1ElmtSize = FDCAN_DATA_BYTES_8;
@@ -169,33 +179,34 @@ void FDCAN::ConfigurePeripheral()
 		/* Configure Rx filter */
 		sFilterConfig.IdType = FDCAN_STANDARD_ID;
 		sFilterConfig.FilterIndex = 0;
-		sFilterConfig.FilterType = FDCAN_FILTER_MASK;
+		sFilterConfig.FilterType = FDCAN_FILTER_RANGE;
 		sFilterConfig.FilterConfig = FDCAN_FILTER_TO_RXFIFO0;
-		sFilterConfig.FilterConfig = FDCAN_FILTER_TO_RXBUFFER;
+//		sFilterConfig.FilterConfig = FDCAN_FILTER_TO_RXBUFFER;
+//
+//		sFilterConfig.FilterConfig = FDCAN_FILTER_DISABLE;
 
-		sFilterConfig.FilterConfig = FDCAN_FILTER_DISABLE;
-
-		sFilterConfig.FilterID1 = 0x701;
+		sFilterConfig.FilterID1 = 0x01;
 		sFilterConfig.FilterID2 = 0x7FF;
 		if (HAL_FDCAN_Init(&_hRes->handle) != HAL_OK)
 		{
 			Error_Handler();
 		}
-		/* USER CODE BEGIN FDCAN1_Init 2 */
+
 		if (HAL_FDCAN_ConfigFilter(&_hRes->handle, &sFilterConfig) != HAL_OK)
 		{
 			/* Filter configuration Error */
 			Error_Handler();
 		}
-		if (HAL_FDCAN_ActivateNotification(&_hRes->handle, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK)
-		{
-			/* Notification Error */
-			Error_Handler();
-		}
+
 		/* START THE CAN MODULE */
 		if (HAL_FDCAN_Start(&_hRes->handle) != HAL_OK)
 		{
 			/* Start Error */
+			Error_Handler();
+		}
+		if (HAL_FDCAN_ActivateNotification(&_hRes->handle, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK)
+		{
+			/* Notification Error */
 			Error_Handler();
 		}
 	}
@@ -269,6 +280,12 @@ void FDCAN::WriteMessage(uint32_t  id, uint8_t len, uint8_t d0, uint8_t d1,
 		/*Transmission request Error*/
 		Error_Handler();
 	}
+//	if(HAL_FDCAN_AddMessageToTxFifoQ(&_hRes->handle, &TxHeader, TxData) != HAL_OK)
+//		{
+//			TxData[1] = 0x2;
+//			/*Transmission request Error*/
+//			Error_Handler();
+//		}
 //	FDCAN_RxHeaderTypeDef RxHeader;
 //	uint8_t RxData[8];
 	/*
@@ -283,9 +300,103 @@ void FDCAN::WriteMessage(uint32_t  id, uint8_t len, uint8_t d0, uint8_t d1,
 */
 }
 
+void FDCAN::Read(FDCAN_RxHeaderTypeDef *pRxHeader, uint8_t *pRxData)
+{
+	int a;
+	if (HAL_FDCAN_GetRxMessage(&_hRes->handle, FDCAN_RX_FIFO0, pRxHeader, pRxData) != HAL_OK)
+	{
+		Error_Handler();
+	}
+	//	if (HAL_FDCAN_ActivateNotification(&_hRes->handle, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK)
+	if (HAL_FDCAN_ActivateNotification(&_hRes->handle, FDCAN_IT_RX_BUFFER_NEW_MESSAGE, 0) != HAL_OK)
+	{
+		/* Notification Error */
+		Error_Handler();
+	}
+}
+void FDCAN::Read()
+{
+	FDCAN_RxHeaderTypeDef RxHeader;
+	uint8_t RxData[8];
+	if (HAL_FDCAN_GetRxMessage(&_hRes->handle, FDCAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
+	{
+		Error_Handler();
+	}
+}
+
+void FDCAN::MessageCallback(FDCAN_HandleTypeDef *hfdcan)
+{
+
+	FDCAN_RxHeaderTypeDef RxHeader;
+	uint8_t RxData[8];
+	if (HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_BUFFER0 , &RxHeader, RxData) != HAL_OK)
+	{
+		Error_Handler();
+	}
+	for(int i=0; i<8; i++) RX_test[i] = RxData[i];
+}
 void FDCAN1_IT0_IRQHandler(void)
 {
 	if (FDCAN::resFDCAN1)
 		HAL_FDCAN_IRQHandler(&FDCAN::resFDCAN1->handle);
 }
+
+void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
+{
+	// clear the buffer I guess
+	FDCAN_RxHeaderTypeDef RxHeader;
+	uint8_t RxData[8];
+	if((RxFifo0ITs & FDCAN_IT_RX_FIFO0_NEW_MESSAGE) != RESET)
+	{
+		/* Retreive Rx messages from RX FIFO0 */
+		if (HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
+		{
+			/* Reception Error */
+			Error_Handler();
+		}
+
+		/* Display LEDx */
+		if ((RxHeader.Identifier == 0x321) && (RxHeader.IdType == FDCAN_STANDARD_ID) && (RxHeader.DataLength == FDCAN_DLC_BYTES_2))
+		{
+//			LED_Display(RxData[0]);
+//			ubKeyNumber = RxData[0];
+		}
+
+		if (HAL_FDCAN_ActivateNotification(hfdcan, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK)
+		{
+			/* Notification Error */
+			Error_Handler();
+		}
+	}
+}
+void HAL_FDCAN_RxBufferNewMessageCallback(FDCAN_HandleTypeDef *hfdcan)
+{
+//	// clear the buffer I guess
+//	FDCAN_RxHeaderTypeDef RxHeader;
+//	uint8_t RxData[8];
+//	/* Retreive Rx messages from RX FIFO0 */
+//	if (HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_BUFFER0, &RxHeader, RxData) != HAL_OK)
+//	{
+//		/* Reception Error */
+//		Error_Handler();
+//	}
+//
+//	/* Display LEDx */
+//	if ((RxHeader.Identifier == 0x321) && (RxHeader.IdType == FDCAN_STANDARD_ID) && (RxHeader.DataLength == FDCAN_DLC_BYTES_2))
+//	{
+//		//			LED_Display(RxData[0]);
+//		//			ubKeyNumber = RxData[0];
+//	}
+//
+//	if (HAL_FDCAN_ActivateNotification(hfdcan, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK)
+//	{
+//		/* Notification Error */
+//		Error_Handler();
+//	}
+	FDCAN::MessageCallback(hfdcan);
+
+}
+
+void HAL_FDCAN_TxFifoEmptyCallback(FDCAN_HandleTypeDef *hfdcan);
+void HAL_FDCAN_TxBufferCompleteCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t BufferIndexes);
 

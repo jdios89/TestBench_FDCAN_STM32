@@ -97,12 +97,12 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_FDCAN1_Init();
+//  MX_FDCAN1_Init();
   /* USER CODE BEGIN 2 */
 	/* Send dummy message*/
 	TxData[0] = 0x08;
 	TxData[1] = 0xAD;
-	if(HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1, &TxHeader, TxData) != HAL_OK)
+//	if(HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1, &TxHeader, TxData) != HAL_OK)
 	{
 
 		/*Transmission request Error*/

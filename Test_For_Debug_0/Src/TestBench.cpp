@@ -19,18 +19,29 @@
 
 void TestBench()
 {
-//	FDCAN_RxHeaderTypeDef RxHeader;
-//	uint8_t RxData[8];
+	FDCAN_RxHeaderTypeDef RxHeader;
+	uint8_t RxData[8] = {};
 //	sfloat d = 1;
-	FDCAN fdcantest;
+ 	FDCAN fdcantest;
 	uint8_t d0, d1,d2,d3,d4,d5,d6,d7;
+	fdcantest.WriteDummyData(0x8);
 	fdcantest.WriteDummyData(0x8);
 	/* Activate remote node
 	 * on nodeid 1
 	 */
 	uint8_t nodeid = 0x1;
+	// Reset Node
+	fdcantest.WriteMessage(0x00, 2, 0x81, nodeid, 0, 0, 0, 0, 0, 0);
+
+	if (HAL_FDCAN_GetRxMessage(&fdcantest._hRes->handle, FDCAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
+	{
+		Error_Handler();
+	}
+	fdcantest.Read();
+	// Switch to operational
 	fdcantest.WriteMessage(0x00, 2, 0x01, nodeid, 0, 0, 0, 0, 0, 0);
 
+	fdcantest.Read(&RxHeader, RxData);
 
 
 	/* Read status of motor */
@@ -94,12 +105,3 @@ void TestBench()
     fdcantest.WriteMessage(cobid, len, d0,d1,d2,d3,d4,d5, 0, 0);
 
 }
-
-
-
-
-
-
-
-
-

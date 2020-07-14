@@ -32,6 +32,9 @@ void TestBench()
 	uint8_t nodeid = 0x1;
 	// Reset Node
 	fdcantest.WriteMessage(0x00, 2, 0x81, nodeid, 0, 0, 0, 0, 0, 0);
+	volatile uint32_t FiffillLevel = 0;
+
+	FiffillLevel = HAL_FDCAN_GetRxFifoFillLevel(&fdcantest._hRes->handle, FDCAN_RX_FIFO0);
 
 	if (HAL_FDCAN_GetRxMessage(&fdcantest._hRes->handle, FDCAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
 	{

@@ -80,6 +80,7 @@ void FDCAN::InitPeripheral()
 		resFDCAN1 = new FDCAN::hardware_resource_t;
 		memset(resFDCAN1, 0, sizeof(FDCAN::hardware_resource_t));
 		firstTime = true;
+		_hRes = resFDCAN1;
 	}
 	if (firstTime) { // first time configuring peripheral
 		_hRes->port = port;
@@ -151,7 +152,7 @@ void FDCAN::ConfigurePeripheral()
 		_hRes->handle.Init.Mode = FDCAN_MODE_NORMAL;
 		_hRes->handle.Init.AutoRetransmission = DISABLE;
 		_hRes->handle.Init.TransmitPause = DISABLE;
-		_hRes->handle.Init.ProtocolException = DISABLE;
+		_hRes->handle.Init.ProtocolException = ENABLE;
 		_hRes->handle.Init.NominalPrescaler = 4;
 		_hRes->handle.Init.NominalSyncJumpWidth = 1;
 		_hRes->handle.Init.NominalTimeSeg1 = 13;
@@ -161,7 +162,7 @@ void FDCAN::ConfigurePeripheral()
 		_hRes->handle.Init.DataTimeSeg1 = 1;
 		_hRes->handle.Init.DataTimeSeg2 = 1;
 		_hRes->handle.Init.MessageRAMOffset = 0;
-		_hRes->handle.Init.StdFiltersNbr = 0;
+		_hRes->handle.Init.StdFiltersNbr = 1;
 		_hRes->handle.Init.ExtFiltersNbr = 0;
 		_hRes->handle.Init.RxFifo0ElmtsNbr = 8;
 		_hRes->handle.Init.RxFifo0ElmtSize = FDCAN_DATA_BYTES_8;
@@ -302,7 +303,7 @@ void FDCAN::WriteMessage(uint32_t  id, uint8_t len, uint8_t d0, uint8_t d1,
 
 void FDCAN::Read(FDCAN_RxHeaderTypeDef *pRxHeader, uint8_t *pRxData)
 {
-	int a;
+//	int a;
 	if (HAL_FDCAN_GetRxMessage(&_hRes->handle, FDCAN_RX_FIFO0, pRxHeader, pRxData) != HAL_OK)
 	{
 		Error_Handler();
@@ -346,28 +347,33 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
 	// clear the buffer I guess
 	FDCAN_RxHeaderTypeDef RxHeader;
 	uint8_t RxData[8];
-	if((RxFifo0ITs & FDCAN_IT_RX_FIFO0_NEW_MESSAGE) != RESET)
-	{
-		/* Retreive Rx messages from RX FIFO0 */
-		if (HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
-		{
-			/* Reception Error */
-			Error_Handler();
-		}
+	uint32_t FifofillLevel = 0;
 
-		/* Display LEDx */
-		if ((RxHeader.Identifier == 0x321) && (RxHeader.IdType == FDCAN_STANDARD_ID) && (RxHeader.DataLength == FDCAN_DLC_BYTES_2))
-		{
-//			LED_Display(RxData[0]);
-//			ubKeyNumber = RxData[0];
-		}
+	FifofillLevel = HAL_FDCAN_GetRxFifoFillLevel(hfdcan, FDCAN_RX_FIFO0);
+
+//	if((RxFifo0ITs & FDCAN_IT_RX_FIFO0_NEW_MESSAGE) != RESET)
+//	{
+//		/* Retreive Rx messages from RX FIFO0 */
+//		if (HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
+//		{
+//			/* Reception Error */
+//			Error_Handler();
+//		}
+//
+//
+//		/* Display LEDx */
+//		if ((RxHeader.Identifier == 0x321) && (RxHeader.IdType == FDCAN_STANDARD_ID) && (RxHeader.DataLength == FDCAN_DLC_BYTES_2))
+//		{
+////			LED_Display(RxData[0]);
+////			ubKeyNumber = RxData[0];
+//		}
 
 		if (HAL_FDCAN_ActivateNotification(hfdcan, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK)
 		{
 			/* Notification Error */
 			Error_Handler();
 		}
-	}
+//	}
 }
 void HAL_FDCAN_RxBufferNewMessageCallback(FDCAN_HandleTypeDef *hfdcan)
 {

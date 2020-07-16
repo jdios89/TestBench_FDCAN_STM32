@@ -19,7 +19,7 @@
 #include "FDCAN.h" //FDCAN Library
 //#include "stm32h7xx_hal.h"
 
-/* Auxiliary function */
+/* Auxiliary functions */
 uint8_t NANOTEC_CANOpen::lowByte(uint16_t byte16)
 {
     return (uint8_t)(byte16 & 0xFF);
@@ -49,7 +49,6 @@ bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
     uint8_t d1 = lowByte(register_index); //register number for 4 bytes
     uint8_t d2 = highByte(register_index);
     uint8_t d3 = subindex;
-
     uint8_t d4 = data;
     uint8_t d5 = 0x0;
     uint8_t d6 = 0x0;
@@ -67,7 +66,6 @@ bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
     uint8_t d1 = lowByte(register_index); //register number for 4 bytes
     uint8_t d2 = highByte(register_index);
     uint8_t d3 = subindex;
-
     uint8_t d4 = data;
     uint8_t d5 = 0x0;
     uint8_t d6 = 0x0;
@@ -161,24 +159,51 @@ void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
         if (messagesReceived > 0)
         {
             _bus->Read(&RxHeader, RxData);
-            uint16_t register_response = (RxData[2]<<8) && RxData[1];
-            if (RxHeader.Identifier == cobid_r && RxData[0] != CAN_ERROR_RESPONSE
-                && register_response == register_index && RxData[3] == subindex)
+            uint16_t register_response = (RxData[2] << 8) && RxData[1];
+            if (RxHeader.Identifier == cobid_r && RxData[0] != CAN_ERROR_RESPONSE && register_response == register_index && RxData[3] == subindex)
             {
                 *data = RxData[4];
-                replied = true; 
+                replied = true;
             }
         }
     }
-
 }
 //
 //void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
 //                                   uint8_t subindex, int8_t *data);
-//
-//void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
-//                                   uint8_t subindex, uint16_t *data);
-//
+
+void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
+                                   uint8_t subindex, uint16_t *data)
+{
+    readRequest(nodeid, register_index, subindex);
+    // delayMicroseconds(300);
+    bool replied = false;
+    FDCAN_RxHeaderTypeDef RxHeader;
+    volatile FDCAN_RxHeaderTypeDef vRxHeader;
+
+    uint8_t RxData[8];
+    volatile uint8_t vRxData[8];
+    volatile uint32_t messagesReceived = _bus->GetRxFiFoLevel();
+    volatile uint32_t cobid_r = nodeid + CAN_SDO_CANID_R;
+    while (!replied /*|| !(micros() - _timetotimeout > _timeout)*/)
+    {
+        messagesReceived = _bus->GetRxFiFoLevel();
+        if (messagesReceived > 0)
+        {
+            _bus->Read(&RxHeader, RxData);
+            for (int i=0; i<8; i++)
+            	vRxData[i] = RxData[i];
+            vRxHeader.Identifier = RxHeader.Identifier;
+            volatile uint16_t register_response = (RxData[2] << 8) + RxData[1];
+            if (RxHeader.Identifier == cobid_r && RxData[0] != CAN_ERROR_RESPONSE && register_response == register_index && RxData[3] == subindex)
+            {
+                *data = (RxData[5] << 8) + RxData[4];
+                replied = true;
+            }
+        }
+    }
+}
+
 //void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
 //                                   uint8_t subindex, int16_t *data);
 //

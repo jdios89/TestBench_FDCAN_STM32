@@ -49,6 +49,9 @@ void TestBench()
 	for (volatile int i =0; i< FiffillLevel; i++)
 		fdcantest.Read();
 
+	// Read status of motor
+	Statusword_DataType current_status = 0x0;
+    CANBustest.readRegister(nodeid, Statusword, 0x0, &current_status );
 
 	// Select the velocity mode
 	uint8_t subind = 0;

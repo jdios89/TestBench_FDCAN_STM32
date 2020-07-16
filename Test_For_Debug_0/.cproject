@@ -64,6 +64,7 @@
 									<listOptionValue builtIn="false" value="../Libraries/Periphirals/FDCAN"/>
 									<listOptionValue builtIn="false" value="../Inc"/>
 									<listOptionValue builtIn="false" value="../Libraries/NanotecMotorRegisters"/>
+									<listOptionValue builtIn="false" value="../Libraries/Devices/NANOTEC"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.306471028" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="__weak=&quot;__attribute__((weak))&quot;"/>

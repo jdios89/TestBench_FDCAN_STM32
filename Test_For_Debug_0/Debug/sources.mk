@@ -26,6 +26,7 @@ CPP_DEPS :=
 # Every subdirectory with source files must be described here
 SUBDIRS := \
 Drivers/STM32H7xx_HAL_Driver/Src \
+Libraries/Devices/NANOTEC \
 Libraries/Periphirals/FDCAN \
 Src \
 startup \

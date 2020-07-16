@@ -18,6 +18,7 @@
 #include "FDCAN.h"
 #include "PD4Cxx08.h"
 #include "CAN_CMD.h"
+#include "NANOTEC_Bus.h"
 
 void TestBench()
 {
@@ -25,6 +26,7 @@ void TestBench()
 	uint8_t RxData[8] = {};
 //	sfloat d = 1;
  	FDCAN fdcantest;
+ 	NANOTEC_CANOpen CANBustest(&fdcantest);
 	uint8_t d0, d1,d2,d3,d4,d5,d6,d7;
 	fdcantest.WriteDummyData(0x8);
 	fdcantest.WriteDummyData(0x8);
@@ -47,18 +49,35 @@ void TestBench()
 	for (volatile int i =0; i< FiffillLevel; i++)
 		fdcantest.Read();
 
+
+	// Select the velocity mode
+	uint8_t subind = 0;
+	Modesofoperation_DataType data = 0x02;
+	CANBustest.writeRegister(nodeid, Modesofoperation, subind, data);
+	// Write desired speed
+	vltargetvelocity_DataType desvel = 0xC8;
+	CANBustest.writeRegister(nodeid, vltargetvelocity, subind, desvel);
+	// Switch the power state machine to operation enabled
+	Controlword_DataType controlword_data = 0x6;
+	CANBustest.writeRegister(nodeid, Controlword, subind, controlword_data);
+	controlword_data = 0x7;
+	CANBustest.writeRegister(nodeid, Controlword, subind, controlword_data);
+	controlword_data = 0xF;
+	CANBustest.writeRegister(nodeid, Controlword, subind, controlword_data);
+	// Stop the motor
+	controlword_data = 0x6;
+	CANBustest.writeRegister(nodeid, Controlword, subind, controlword_data);
+
 	// Select the velocity mode
 
 	uint8_t lmodesofoperation = Modesofoperation & 0xFF;
 	uint8_t hmodesofoperation = (Modesofoperation>>8) & 0xFF;
-	uint8_t subind = 0;
-	Modesofoperation_DataType data = 0x02;
+	subind = 0;
 	fdcantest.WriteMessage(CAN_SDO_CANID_W + nodeid, 8,
 			CAN_SDOW_DATA_BYTE_1, lmodesofoperation,hmodesofoperation,
 			subind,	data,0,0,0);
 
 	// Write desired speed
-	vltargetvelocity_DataType desvel = 0xC8;
 	uint8_t lvlt = desvel & 0xFF;
 	uint8_t hvlt = (desvel>>8) & 0xFF;
 	uint8_t lvl = vltargetvelocity & 0xFF;
@@ -68,7 +87,7 @@ void TestBench()
 			subind,	lvlt,hvlt,0,0);
 
 	// Switch the power state machine to operation enabled
-	Controlword_DataType controlword_data = 0x6;
+	 controlword_data = 0x6;
 	uint8_t lctrl = Controlword & 0xFF;
 	uint8_t hctrl = (Controlword>>8) & 0xFF;
 	uint8_t lctrld = controlword_data & 0xFF;
@@ -99,12 +118,6 @@ void TestBench()
 			CAN_SDOW_DATA_BYTE_2, lctrl,hctrl,
 			subind,	lctrld,hctrld,0,0);
 
-
-
-
-
-
-
 	if (HAL_FDCAN_GetRxMessage(&fdcantest._hRes->handle, FDCAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
 	{
 		Error_Handler();
@@ -114,7 +127,6 @@ void TestBench()
 	fdcantest.WriteMessage(CAN_NMT, 2, CAN_SWITCH_TO_OPERATIONAL, nodeid, 0, 0, 0, 0, 0, 0);
 
 	fdcantest.Read(&RxHeader, RxData);
-
 
 	/* Read status of motor */
 	uint8_t READ_REQUEST_CAN = 0x40;
@@ -132,7 +144,6 @@ void TestBench()
 	d7 = 0;
 	uint32_t cobid = CAN_SDO_CANID_W + nodeid;
 	fdcantest.WriteMessage(cobid, len, d0,d1,d2,d3,d4,d5,d6,d7);
-
 
 	/* Reset fault if any */
 	uint16_t WRITE_REQUEST_CAN = 0x600;
@@ -176,5 +187,4 @@ void TestBench()
     d4 = datas & 0xFF;
     d5 = (datas >> 8) & 0xFF;
     fdcantest.WriteMessage(cobid, len, d0,d1,d2,d3,d4,d5, 0, 0);
-
 }

@@ -11,6 +11,7 @@ RM := rm -rf
 -include startup/subdir.mk
 -include Src/subdir.mk
 -include Libraries/Periphirals/FDCAN/subdir.mk
+-include Libraries/Devices/NANOTEC/subdir.mk
 -include Drivers/STM32H7xx_HAL_Driver/Src/subdir.mk
 -include subdir.mk
 -include objects.mk

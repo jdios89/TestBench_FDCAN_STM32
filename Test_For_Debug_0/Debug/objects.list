@@ -17,6 +17,8 @@
 "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc_ex.o"
 "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim.o"
 "Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim_ex.o"
+"Libraries/Devices/NANOTEC/NANOTEC.o"
+"Libraries/Devices/NANOTEC/NANOTEC_Bus.o"
 "Libraries/Periphirals/FDCAN/FDCAN.o"
 "Src/TestBench.o"
 "Src/main.o"

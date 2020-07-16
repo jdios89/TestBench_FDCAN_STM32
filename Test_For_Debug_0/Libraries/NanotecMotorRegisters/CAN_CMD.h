@@ -25,5 +25,10 @@
 #define CAN_SDOR_DATA_BYTE_4 0x43
 
 #define CAN_SDO_CANID_W 0x600
-#define CAN SDO_CANID_R 0x580
+#define CAN_SDO_CANID_R 0x580
+#define CAN_READ_REQUEST 0x40
+
+#define CAN_WRITE_RESPONSE 0x60
+#define CAN_ERROR_RESPONSE 0x80
+
 #endif

@@ -30,7 +30,9 @@ Src/TestBench.o: ../Src/TestBench.cpp \
  /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pwr.h \
  /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_pwr_ex.h \
  /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Inc/stm32h7xx_nucleo_144.h \
- /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Libraries/Periphirals/FDCAN/FDCAN.h
+ /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Libraries/Periphirals/FDCAN/FDCAN.h \
+ /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Libraries/NanotecMotorRegisters/PD4Cxx08.h \
+ /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Libraries/NanotecMotorRegisters/CAN_CMD.h
 
 /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Inc/main.h:
 
@@ -95,3 +97,7 @@ Src/TestBench.o: ../Src/TestBench.cpp \
 /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Inc/stm32h7xx_nucleo_144.h:
 
 /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Libraries/Periphirals/FDCAN/FDCAN.h:
+
+/home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Libraries/NanotecMotorRegisters/PD4Cxx08.h:
+
+/home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Libraries/NanotecMotorRegisters/CAN_CMD.h:

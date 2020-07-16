@@ -16,6 +16,8 @@
 //#include "cmsis_os.h"
 
 #include "FDCAN.h"
+#include "PD4Cxx08.h"
+#include "CAN_CMD.h"
 
 void TestBench()
 {
@@ -31,10 +33,77 @@ void TestBench()
 	 */
 	uint8_t nodeid = 0x1;
 	// Reset Node
-	fdcantest.WriteMessage(0x00, 2, 0x81, nodeid, 0, 0, 0, 0, 0, 0);
-	volatile uint32_t FiffillLevel = 0;
+//	fdcantest.WriteMessage(0x00, 2, 0x81, nodeid, 0, 0, 0, 0, 0, 0);
+	fdcantest.WriteMessage(CAN_NMT, 2, CAN_RESET_NODE, nodeid, 0, 0, 0, 0, 0, 0);
 
+	volatile uint32_t FiffillLevel = 0;
 	FiffillLevel = HAL_FDCAN_GetRxFifoFillLevel(&fdcantest._hRes->handle, FDCAN_RX_FIFO0);
+	for (volatile int i =0; i< FiffillLevel; i++)
+		fdcantest.Read();
+
+	// Activate remote node
+	fdcantest.WriteMessage(CAN_NMT, 2, CAN_SWITCH_TO_OPERATIONAL, nodeid, 0, 0, 0, 0, 0, 0);
+	FiffillLevel = HAL_FDCAN_GetRxFifoFillLevel(&fdcantest._hRes->handle, FDCAN_RX_FIFO0);
+	for (volatile int i =0; i< FiffillLevel; i++)
+		fdcantest.Read();
+
+	// Select the velocity mode
+
+	uint8_t lmodesofoperation = Modesofoperation & 0xFF;
+	uint8_t hmodesofoperation = (Modesofoperation>>8) & 0xFF;
+	uint8_t subind = 0;
+	Modesofoperation_DataType data = 0x02;
+	fdcantest.WriteMessage(CAN_SDO_CANID_W + nodeid, 8,
+			CAN_SDOW_DATA_BYTE_1, lmodesofoperation,hmodesofoperation,
+			subind,	data,0,0,0);
+
+	// Write desired speed
+	vltargetvelocity_DataType desvel = 0xC8;
+	uint8_t lvlt = desvel & 0xFF;
+	uint8_t hvlt = (desvel>>8) & 0xFF;
+	uint8_t lvl = vltargetvelocity & 0xFF;
+	uint8_t hvl = (vltargetvelocity>>8) & 0xFF;
+	fdcantest.WriteMessage(CAN_SDO_CANID_W + nodeid, 8,
+			CAN_SDOW_DATA_BYTE_2, lvl,hvl,
+			subind,	lvlt,hvlt,0,0);
+
+	// Switch the power state machine to operation enabled
+	Controlword_DataType controlword_data = 0x6;
+	uint8_t lctrl = Controlword & 0xFF;
+	uint8_t hctrl = (Controlword>>8) & 0xFF;
+	uint8_t lctrld = controlword_data & 0xFF;
+	uint8_t hctrld = (controlword_data>>8) & 0xFF;
+	fdcantest.WriteMessage(CAN_SDO_CANID_W + nodeid, 8,
+			CAN_SDOW_DATA_BYTE_2, lctrl,hctrl,
+			subind,	lctrld,hctrld,0,0);
+
+	controlword_data = 0x7;
+	lctrld = controlword_data & 0xFF;
+	hctrld = (controlword_data>>8) & 0xFF;
+	fdcantest.WriteMessage(CAN_SDO_CANID_W + nodeid, 8,
+			CAN_SDOW_DATA_BYTE_2, lctrl,hctrl,
+			subind,	lctrld,hctrld,0,0);
+
+	controlword_data = 0xF;
+	lctrld = controlword_data & 0xFF;
+	hctrld = (controlword_data>>8) & 0xFF;
+	fdcantest.WriteMessage(CAN_SDO_CANID_W + nodeid, 8,
+			CAN_SDOW_DATA_BYTE_2, lctrl,hctrl,
+			subind,	lctrld,hctrld,0,0);
+
+	// Stop the motor
+	controlword_data = 0x6;
+	lctrld = controlword_data & 0xFF;
+	hctrld = (controlword_data>>8) & 0xFF;
+	fdcantest.WriteMessage(CAN_SDO_CANID_W + nodeid, 8,
+			CAN_SDOW_DATA_BYTE_2, lctrl,hctrl,
+			subind,	lctrld,hctrld,0,0);
+
+
+
+
+
+
 
 	if (HAL_FDCAN_GetRxMessage(&fdcantest._hRes->handle, FDCAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
 	{
@@ -42,7 +111,7 @@ void TestBench()
 	}
 	fdcantest.Read();
 	// Switch to operational
-	fdcantest.WriteMessage(0x00, 2, 0x01, nodeid, 0, 0, 0, 0, 0, 0);
+	fdcantest.WriteMessage(CAN_NMT, 2, CAN_SWITCH_TO_OPERATIONAL, nodeid, 0, 0, 0, 0, 0, 0);
 
 	fdcantest.Read(&RxHeader, RxData);
 
@@ -61,7 +130,8 @@ void TestBench()
 	d5 = 0;
 	d6 = 0;
 	d7 = 0;
-	fdcantest.WriteMessage(0x601, len, d0,d1,d2,d3,d4,d5,d6,d7);
+	uint32_t cobid = CAN_SDO_CANID_W + nodeid;
+	fdcantest.WriteMessage(cobid, len, d0,d1,d2,d3,d4,d5,d6,d7);
 
 
 	/* Reset fault if any */
@@ -73,7 +143,7 @@ void TestBench()
 	uint8_t subindex = 0x0;
 	uint16_t datas = 0x06;
 
-	uint32_t cobid = nodeid + WRITE_REQUEST_CAN;
+	cobid = nodeid + WRITE_REQUEST_CAN;
 	len = 8;
 
 	d0 = CANWRITE_2BYTE;

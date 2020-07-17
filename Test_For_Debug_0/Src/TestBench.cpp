@@ -40,13 +40,13 @@ void TestBench()
 
 	volatile uint32_t FiffillLevel = 0;
 	FiffillLevel = HAL_FDCAN_GetRxFifoFillLevel(&fdcantest._hRes->handle, FDCAN_RX_FIFO0);
-	for (volatile int i =0; i< FiffillLevel; i++)
+	for (volatile uint8_t i =0; i< FiffillLevel; i++)
 		fdcantest.Read();
 
 	// Activate remote node
 	fdcantest.WriteMessage(CAN_NMT, 2, CAN_SWITCH_TO_OPERATIONAL, nodeid, 0, 0, 0, 0, 0, 0);
 	FiffillLevel = HAL_FDCAN_GetRxFifoFillLevel(&fdcantest._hRes->handle, FDCAN_RX_FIFO0);
-	for (volatile int i =0; i< FiffillLevel; i++)
+	for (volatile uint8_t i =0; i< FiffillLevel; i++)
 		fdcantest.Read();
 
 	// Read status of motor

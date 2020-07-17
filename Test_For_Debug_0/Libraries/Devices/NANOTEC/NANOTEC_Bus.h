@@ -33,64 +33,67 @@ public:
 	/* writes data depending on the data input */
 	/* Write to 8 bit unsigned integer */
 	bool writeRegister(uint8_t nodeid, uint16_t register_index,
-			uint8_t subindex, uint8_t data);
+					   uint8_t subindex, uint8_t data);
 	/* Write to 8 bit signed integer */
 	bool writeRegister(uint8_t nodeid, uint16_t register_index,
-			uint8_t subindex, int8_t data);
+					   uint8_t subindex, int8_t data);
 	/* Write to 16 bit unsigned integer */
 	bool writeRegister(uint8_t nodeid, uint16_t register_index,
-			uint8_t subindex, uint16_t data);
+					   uint8_t subindex, uint16_t data);
 	/* Write to 16 bit signed integer */
 	bool writeRegister(uint8_t nodeid, uint16_t register_index,
-			uint8_t subindex, int16_t data);
+					   uint8_t subindex, int16_t data);
 	/* Write to 32 bit unsigned integer */
 	bool writeRegister(uint8_t nodeid, uint16_t register_index,
-			uint8_t subindex, uint32_t data);
+					   uint8_t subindex, uint32_t data);
 	/* Write to 32 bit signed integer */
 	bool writeRegister(uint8_t nodeid, uint16_t register_index,
-			uint8_t subindex, int32_t data);
+					   uint8_t subindex, int32_t data);
 
 	/* Read request from register */
 	void readRegister(uint8_t nodeid, uint16_t register_index,
-			uint8_t subindex, uint8_t *data);
+					  uint8_t subindex, uint8_t *data);
 
 	void readRegister(uint8_t nodeid, uint16_t register_index,
-			uint8_t subindex, int8_t *data);
+					  uint8_t subindex, int8_t *data);
 
 	void readRegister(uint8_t nodeid, uint16_t register_index,
-			uint8_t subindex, uint16_t *data);
+					  uint8_t subindex, uint16_t *data);
 
 	void readRegister(uint8_t nodeid, uint16_t register_index,
-			uint8_t subindex, int16_t *data);
+					  uint8_t subindex, int16_t *data);
 
 	void readRegister(uint8_t nodeid, uint16_t register_index,
-			uint8_t subindex, uint32_t *data);
+					  uint8_t subindex, uint32_t *data);
 
 	void readRegister(uint8_t nodeid, uint16_t register_index,
-			uint8_t subindex, int32_t *data);
+					  uint8_t subindex, int32_t *data);
 
 	void readRequest(uint8_t nodeid, uint16_t register_index,
-			uint8_t subindex);
+					 uint8_t subindex);
 
 	bool waitReply(uint8_t nodeid, uint16_t register_index,
-			uint8_t subindex, uint8_t * data);
+				   uint8_t subindex, uint32_t timeout, uint8_t * data);
 	bool waitReply(uint8_t nodeid, uint16_t register_index,
-			uint8_t subindex, int8_t * data);
+				   uint8_t subindex, uint32_t timeout, int8_t * data);
 	bool waitReply(uint8_t nodeid, uint16_t register_index,
-			uint8_t subindex, uint16_t * data);
+				   uint8_t subindex, uint32_t timeout, uint16_t * data);
 	bool waitReply(uint8_t nodeid, uint16_t register_index,
-			uint8_t subindex, int16_t * data);
+				   uint8_t subindex, uint32_t timeout, int16_t * data);
 	bool waitReply(uint8_t nodeid, uint16_t register_index,
-			uint8_t subindex, uint32_t * data);
+				   uint8_t subindex, uint32_t timeout, uint32_t * data);
 	bool waitReply(uint8_t nodeid, uint16_t register_index,
-			uint8_t subindex, int32_t * data);
+				   uint8_t subindex, uint32_t timeout, int32_t * data);
+
+	bool waitReply(uint8_t nodeid, uint16_t register_index,
+				   uint8_t subindex, uint32_t timeout);
 
 private:
-	FDCAN *_bus;
-    uint8_t lowByte(uint16_t byte16);
-    uint8_t highByte(uint16_t byte16);
-    uint8_t lowByte(int16_t byte16);
-    uint8_t highByte(int16_t byte16);
+	FDCAN * _bus;
+	uint8_t lowByte(uint16_t byte16);
+	uint8_t highByte(uint16_t byte16);
+	uint8_t lowByte(int16_t byte16);
+	uint8_t highByte(int16_t byte16);
 };
 
 #endif

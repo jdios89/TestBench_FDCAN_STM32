@@ -43,6 +43,7 @@ uint8_t NANOTEC_CANOpen::highByte(int16_t byte16)
 bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
                                     uint8_t subindex, uint8_t data)
 {
+    bool write_confirmed = false;
     uint32_t id = nodeid + CAN_SDO_CANID_W;
     uint8_t len = 8;
     uint8_t d0 = CAN_SDOW_DATA_BYTE_1;
@@ -54,12 +55,18 @@ bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
     uint8_t d6 = 0x0;
     uint8_t d7 = 0x0; //MSB , little endian format
     _bus->WriteMessage(id, len, d0, d1, d2, d3, d4, d5, d6, d7);
-    return true;
+    // Wait for a reply, set timeout of 2 ms
+    // HAL_Delay(1);
+    uint32_t timeout = 2;
+    /* wait for reply */
+    write_confirmed = waitReply(nodeid, register_index, subindex, timeout);
+    return write_confirmed;
 }
 /* Write to 8 bit signed integer */
 bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
                                     uint8_t subindex, int8_t data)
 {
+    bool write_confirmed = false;
     uint32_t id = nodeid + CAN_SDO_CANID_W;
     uint8_t len = 8;
     uint8_t d0 = CAN_SDOW_DATA_BYTE_1;
@@ -71,12 +78,18 @@ bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
     uint8_t d6 = 0x0;
     uint8_t d7 = 0x0; //MSB , little endian format
     _bus->WriteMessage(id, len, d0, d1, d2, d3, d4, d5, d6, d7);
-    return true;
+    // Wait for a reply, set timeout of 2 ms
+    // HAL_Delay(1);
+    uint32_t timeout = 2;
+    /* wait for reply */
+    write_confirmed = waitReply(nodeid, register_index, subindex, timeout);
+    return write_confirmed;
 }
 /* Write to 16 bit unsigned integer */
 bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
                                     uint8_t subindex, uint16_t data)
 {
+    bool write_confirmed = false;
     uint32_t id = nodeid + CAN_SDO_CANID_W;
     uint8_t len = 8;
     uint8_t d0 = CAN_SDOW_DATA_BYTE_2;
@@ -88,12 +101,18 @@ bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
     uint8_t d6 = 0x0;
     uint8_t d7 = 0x0; //MSB , little endian format
     _bus->WriteMessage(id, len, d0, d1, d2, d3, d4, d5, d6, d7);
-    return true;
+    // Wait for a reply, set timeout of 2 ms
+    // HAL_Delay(1);
+    uint32_t timeout = 2;
+    /* wait for reply */
+    write_confirmed = waitReply(nodeid, register_index, subindex, timeout);
+    return write_confirmed;
 }
 /* Write to 16 bit signed integer */
 bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
                                     uint8_t subindex, int16_t data)
 {
+    bool write_confirmed = false;
     uint32_t id = nodeid + CAN_SDO_CANID_W;
     uint8_t len = 8;
     uint8_t d0 = CAN_SDOW_DATA_BYTE_2;
@@ -105,12 +124,18 @@ bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
     uint8_t d6 = 0x0;
     uint8_t d7 = 0x0; //MSB , little endian format
     _bus->WriteMessage(id, len, d0, d1, d2, d3, d4, d5, d6, d7);
-    return true;
+    // Wait for a reply, set timeout of 2 ms
+    // HAL_Delay(1);
+    uint32_t timeout = 2;
+    /* wait for reply */
+    write_confirmed = waitReply(nodeid, register_index, subindex, timeout);
+    return write_confirmed;
 }
 /* Write to 32 bit unsigned integer */
 bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
                                     uint8_t subindex, uint32_t data)
 {
+    bool write_confirmed = false;
     uint32_t id = nodeid + CAN_SDO_CANID_W;
     uint8_t len = 8;
     uint8_t d0 = CAN_SDOW_DATA_BYTE_2;
@@ -122,12 +147,18 @@ bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
     uint8_t d6 = (data >> 16) & 0xFF;
     uint8_t d7 = (data >> 24) & 0xFF; //MSB , little endian format
     _bus->WriteMessage(id, len, d0, d1, d2, d3, d4, d5, d6, d7);
-    return true;
+    // Wait for a reply, set timeout of 2 ms
+    // HAL_Delay(1);
+    uint32_t timeout = 2;
+    /* wait for reply */
+    write_confirmed = waitReply(nodeid, register_index, subindex, timeout);
+    return write_confirmed;
 }
 /* Write to 32 bit signed integer */
 bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
                                     uint8_t subindex, int32_t data)
 {
+    bool write_confirmed = false;
     uint32_t id = nodeid + CAN_SDO_CANID_W;
     uint8_t len = 8;
     uint8_t d0 = CAN_SDOW_DATA_BYTE_2;
@@ -139,7 +170,12 @@ bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
     uint8_t d6 = (data >> 16) & 0xFF;
     uint8_t d7 = (data >> 24) & 0xFF; //MSB , little endian format
     _bus->WriteMessage(id, len, d0, d1, d2, d3, d4, d5, d6, d7);
-    return true;
+    // Wait for a reply, set timeout of 2 ms
+    // HAL_Delay(1);
+    uint32_t timeout = 2;
+    /* wait for reply */
+    write_confirmed = waitReply(nodeid, register_index, subindex, timeout);
+    return write_confirmed;
 }
 
 /* Read request from register */
@@ -147,13 +183,17 @@ void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
                                    uint8_t subindex, uint8_t *data)
 {
     readRequest(nodeid, register_index, subindex);
+    uint32_t timeout = 2; // 2 ms timeout
+    bool read_confirmed = false;
+    read_confirmed = waitReply(nodeid, register_index, subindex, timeout, data);
     // delayMicroseconds(300);
+    /*
     bool replied = false;
     FDCAN_RxHeaderTypeDef RxHeader;
     uint8_t RxData[8];
     uint32_t messagesReceived = _bus->GetRxFiFoLevel();
     uint32_t cobid_r = nodeid + CAN_SDO_CANID_R;
-    while (!replied /*|| !(micros() - _timetotimeout > _timeout)*/)
+    while (!replied )
     {
         messagesReceived = _bus->GetRxFiFoLevel();
         if (messagesReceived > 0)
@@ -167,6 +207,7 @@ void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
             }
         }
     }
+    */
 }
 //
 //void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
@@ -176,7 +217,11 @@ void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
                                    uint8_t subindex, uint16_t *data)
 {
     readRequest(nodeid, register_index, subindex);
+    uint32_t timeout = 2; // 2 ms timeout
+    bool read_confirmed = false;
+    read_confirmed = waitReply(nodeid, register_index, subindex, timeout, data);
     // delayMicroseconds(300);
+    /*
     bool replied = false;
     FDCAN_RxHeaderTypeDef RxHeader;
     volatile FDCAN_RxHeaderTypeDef vRxHeader;
@@ -185,14 +230,14 @@ void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
     volatile uint8_t vRxData[8];
     volatile uint32_t messagesReceived = _bus->GetRxFiFoLevel();
     volatile uint32_t cobid_r = nodeid + CAN_SDO_CANID_R;
-    while (!replied /*|| !(micros() - _timetotimeout > _timeout)*/)
+    while (!replied )
     {
         messagesReceived = _bus->GetRxFiFoLevel();
         if (messagesReceived > 0)
         {
             _bus->Read(&RxHeader, RxData);
-            for (int i=0; i<8; i++)
-            	vRxData[i] = RxData[i];
+            for (int i = 0; i < 8; i++)
+                vRxData[i] = RxData[i];
             vRxHeader.Identifier = RxHeader.Identifier;
             volatile uint16_t register_response = (RxData[2] << 8) + RxData[1];
             if (RxHeader.Identifier == cobid_r && RxData[0] != CAN_ERROR_RESPONSE && register_response == register_index && RxData[3] == subindex)
@@ -202,16 +247,35 @@ void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
             }
         }
     }
+    */
 }
 
-//void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
-//                                   uint8_t subindex, int16_t *data);
-//
-//void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
-//                                   uint8_t subindex, uint32_t *data);
-//
-//void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
-//                                   uint8_t subindex, int32_t *data);
+void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
+                                   uint8_t subindex, int16_t *data)
+{
+    readRequest(nodeid, register_index, subindex);
+    uint32_t timeout = 2; // 2 ms timeout
+    bool read_confirmed = false;
+    read_confirmed = waitReply(nodeid, register_index, subindex, timeout, data);
+}
+
+void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
+                                   uint8_t subindex, uint32_t *data)
+{
+    readRequest(nodeid, register_index, subindex);
+    uint32_t timeout = 2; // 2 ms timeout
+    bool read_confirmed = false;
+    read_confirmed = waitReply(nodeid, register_index, subindex, timeout, data);
+}
+
+void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
+                                   uint8_t subindex, int32_t *data)
+{
+    readRequest(nodeid, register_index, subindex);
+    uint32_t timeout = 2; // 2 ms timeout
+    bool read_confirmed = false;
+    read_confirmed = waitReply(nodeid, register_index, subindex, timeout, data);
+}
 
 void NANOTEC_CANOpen::readRequest(uint8_t nodeid, uint16_t register_index,
                                   uint8_t subindex)
@@ -229,3 +293,270 @@ void NANOTEC_CANOpen::readRequest(uint8_t nodeid, uint16_t register_index,
     uint8_t d7 = 0;
     _bus->WriteMessage(id, len, d0, d1, d2, d3, d4, d5, d6, d7);
 }
+
+bool NANOTEC_CANOpen::waitReply(uint8_t nodeid, uint16_t register_index,
+                                uint8_t subindex, uint32_t timeout)
+{
+    FDCAN_RxHeaderTypeDef RxHeader;
+    volatile FDCAN_RxHeaderTypeDef vRxHeader;
+    bool replied = false;
+    uint8_t RxData[8];
+    volatile uint8_t vRxData[8];
+    volatile uint32_t messagesReceived = _bus->GetRxFiFoLevel();
+    volatile uint32_t cobid_r = nodeid + CAN_SDO_CANID_R;
+    volatile uint32_t chrono = 0;
+    while (!replied && chrono < timeout)
+    {
+        messagesReceived = _bus->GetRxFiFoLevel();
+        if (messagesReceived > 0)
+        {
+            _bus->Read(&RxHeader, RxData);
+            for (int i = 0; i < 8; i++)
+                vRxData[i] = RxData[i];
+            vRxHeader.Identifier = RxHeader.Identifier;
+            volatile uint16_t register_response = (RxData[2] << 8) + RxData[1];
+            if (RxHeader.Identifier == cobid_r && RxData[0] != CAN_ERROR_RESPONSE && register_response == register_index && RxData[3] == subindex)
+            {
+                replied = true;
+                break;
+            }
+        }
+        HAL_Delay(1);
+        chrono++;
+    }
+    return replied;
+}
+bool NANOTEC_CANOpen::waitReply(uint8_t nodeid, uint16_t register_index,
+                                uint8_t subindex, uint32_t timeout, uint8_t *data)
+{
+    FDCAN_RxHeaderTypeDef RxHeader;
+    volatile FDCAN_RxHeaderTypeDef vRxHeader;
+    bool replied = false;
+    uint8_t RxData[8];
+    volatile uint8_t vRxData[8];
+    volatile uint32_t messagesReceived = _bus->GetRxFiFoLevel();
+    volatile uint32_t cobid_r = nodeid + CAN_SDO_CANID_R;
+    volatile uint32_t chrono = 0;
+    while (!replied && chrono < timeout)
+    {
+        messagesReceived = _bus->GetRxFiFoLevel();
+        if (messagesReceived > 0)
+        {
+            _bus->Read(&RxHeader, RxData);
+            for (int i = 0; i < 8; i++)
+                vRxData[i] = RxData[i];
+            vRxHeader.Identifier = RxHeader.Identifier;
+            volatile uint16_t register_response = (RxData[2] << 8) + RxData[1];
+            if (RxHeader.Identifier == cobid_r && RxData[0] != CAN_ERROR_RESPONSE && register_response == register_index && RxData[3] == subindex)
+            {
+                *data = RxData[4];
+                replied = true;
+                break;
+            }
+        }
+        HAL_Delay(1);
+        chrono++;
+    }
+    return replied;
+}
+
+bool NANOTEC_CANOpen::waitReply(uint8_t nodeid, uint16_t register_index,
+                                uint8_t subindex, uint32_t timeout, int8_t *data)
+{
+    FDCAN_RxHeaderTypeDef RxHeader;
+    volatile FDCAN_RxHeaderTypeDef vRxHeader;
+    bool replied = false;
+    uint8_t RxData[8];
+    volatile uint8_t vRxData[8];
+    volatile uint32_t messagesReceived = _bus->GetRxFiFoLevel();
+    volatile uint32_t cobid_r = nodeid + CAN_SDO_CANID_R;
+    volatile uint32_t chrono = 0;
+    while (!replied && chrono < timeout)
+    {
+        messagesReceived = _bus->GetRxFiFoLevel();
+        if (messagesReceived > 0)
+        {
+            _bus->Read(&RxHeader, RxData);
+            for (int i = 0; i < 8; i++)
+                vRxData[i] = RxData[i];
+            vRxHeader.Identifier = RxHeader.Identifier;
+            volatile uint16_t register_response = (RxData[2] << 8) + RxData[1];
+            if (RxHeader.Identifier == cobid_r && RxData[0] != CAN_ERROR_RESPONSE && register_response == register_index && RxData[3] == subindex)
+            {
+                //TODO: Confirm data size
+                *data = RxData[4];
+                replied = true;
+                break;
+            }
+        }
+        HAL_Delay(1);
+        chrono++;
+    }
+    return replied;
+}
+bool NANOTEC_CANOpen::waitReply(uint8_t nodeid, uint16_t register_index,
+                                uint8_t subindex, uint32_t timeout, uint16_t *data)
+{
+    FDCAN_RxHeaderTypeDef RxHeader;
+    volatile FDCAN_RxHeaderTypeDef vRxHeader;
+    bool replied = false;
+    uint8_t RxData[8];
+    volatile uint8_t vRxData[8];
+    volatile uint32_t messagesReceived = _bus->GetRxFiFoLevel();
+    volatile uint32_t cobid_r = nodeid + CAN_SDO_CANID_R;
+    volatile uint32_t chrono = 0;
+    while (!replied && chrono < timeout)
+    {
+        messagesReceived = _bus->GetRxFiFoLevel();
+        if (messagesReceived > 0)
+        {
+            _bus->Read(&RxHeader, RxData);
+            for (int i = 0; i < 8; i++)
+                vRxData[i] = RxData[i];
+            vRxHeader.Identifier = RxHeader.Identifier;
+            volatile uint16_t register_response = (RxData[2] << 8) + RxData[1];
+            if (RxHeader.Identifier == cobid_r && RxData[0] != CAN_ERROR_RESPONSE && register_response == register_index && RxData[3] == subindex)
+            {
+                //TODO: Confirm data size
+                *data = (RxData[5] << 8) + RxData[4];
+                replied = true;
+                break;
+            }
+        }
+        HAL_Delay(1);
+        chrono++;
+    }
+    return replied;
+}
+bool NANOTEC_CANOpen::waitReply(uint8_t nodeid, uint16_t register_index,
+                                uint8_t subindex, uint32_t timeout, int16_t *data)
+{
+    union {
+        int16_t mInt16;           // 4 bytes
+        uint8_t mInt16InBytes[2]; //  mapped onto the same storage as myuInt16
+    } UnionInt16;
+    FDCAN_RxHeaderTypeDef RxHeader;
+    volatile FDCAN_RxHeaderTypeDef vRxHeader;
+    bool replied = false;
+    uint8_t RxData[8];
+    volatile uint8_t vRxData[8];
+    volatile uint32_t messagesReceived = _bus->GetRxFiFoLevel();
+    volatile uint32_t cobid_r = nodeid + CAN_SDO_CANID_R;
+    volatile uint32_t chrono = 0;
+    while (!replied && chrono < timeout)
+    {
+        messagesReceived = _bus->GetRxFiFoLevel();
+        if (messagesReceived > 0)
+        {
+            _bus->Read(&RxHeader, RxData);
+            for (int i = 0; i < 8; i++)
+                vRxData[i] = RxData[i];
+            vRxHeader.Identifier = RxHeader.Identifier;
+            volatile uint16_t register_response = (RxData[2] << 8) + RxData[1];
+            if (RxHeader.Identifier == cobid_r && RxData[0] != CAN_ERROR_RESPONSE && register_response == register_index && RxData[3] == subindex)
+            {
+                //TODO: Confirm data size
+                for (int i = 0; i < 2; i++)
+                    UnionInt16.mInt16InBytes[i] = RxData[i + 4];
+                *data = UnionInt16.mInt16;
+                replied = true;
+                break;
+            }
+        }
+        HAL_Delay(1);
+        chrono++;
+    }
+    return replied;
+}
+bool NANOTEC_CANOpen::waitReply(uint8_t nodeid, uint16_t register_index,
+                                uint8_t subindex, uint32_t timeout, uint32_t *data)
+{
+    FDCAN_RxHeaderTypeDef RxHeader;
+    volatile FDCAN_RxHeaderTypeDef vRxHeader;
+    bool replied = false;
+    uint8_t RxData[8];
+    volatile uint8_t vRxData[8];
+    volatile uint32_t messagesReceived = _bus->GetRxFiFoLevel();
+    volatile uint32_t cobid_r = nodeid + CAN_SDO_CANID_R;
+    volatile uint32_t chrono = 0;
+    while (!replied && chrono < timeout)
+    {
+        messagesReceived = _bus->GetRxFiFoLevel();
+        if (messagesReceived > 0)
+        {
+            _bus->Read(&RxHeader, RxData);
+            for (int i = 0; i < 8; i++)
+                vRxData[i] = RxData[i];
+            vRxHeader.Identifier = RxHeader.Identifier;
+            volatile uint16_t register_response = (RxData[2] << 8) + RxData[1];
+            if (RxHeader.Identifier == cobid_r && RxData[0] != CAN_ERROR_RESPONSE && register_response == register_index && RxData[3] == subindex)
+            {
+                //TODO: Confirm data size
+                *data = (RxData[7] << 24) + (RxData[6] << 16) + (RxData[5] << 8) + RxData[4];
+                replied = true;
+                break;
+            }
+        }
+        HAL_Delay(1);
+        chrono++;
+    }
+    return replied;
+}
+bool NANOTEC_CANOpen::waitReply(uint8_t nodeid, uint16_t register_index,
+                                uint8_t subindex, uint32_t timeout, int32_t *data)
+{
+    union {
+        int32_t mInt32;           // 4 bytes
+        uint8_t mInt32InBytes[2]; //  mapped onto the same storage as myuInt16
+    } UnionInt32;
+    FDCAN_RxHeaderTypeDef RxHeader;
+    volatile FDCAN_RxHeaderTypeDef vRxHeader;
+    bool replied = false;
+    uint8_t RxData[8];
+    volatile uint8_t vRxData[8];
+    volatile uint32_t messagesReceived = _bus->GetRxFiFoLevel();
+    volatile uint32_t cobid_r = nodeid + CAN_SDO_CANID_R;
+    volatile uint32_t chrono = 0;
+    while (!replied && chrono < timeout)
+    {
+        messagesReceived = _bus->GetRxFiFoLevel();
+        if (messagesReceived > 0)
+        {
+            _bus->Read(&RxHeader, RxData);
+            for (int i = 0; i < 8; i++)
+                vRxData[i] = RxData[i];
+            vRxHeader.Identifier = RxHeader.Identifier;
+            volatile uint16_t register_response = (RxData[2] << 8) + RxData[1];
+            if (RxHeader.Identifier == cobid_r && RxData[0] != CAN_ERROR_RESPONSE && register_response == register_index && RxData[3] == subindex)
+            {
+                //TODO: Confirm data size
+                for (int i = 0; i < 4; i++)
+                    UnionInt32.mInt32InBytes[i] = RxData[i + 4];
+                *data = UnionInt32.mInt32;
+                replied = true;
+                break;
+            }
+        }
+        HAL_Delay(1);
+        chrono++;
+    }
+    return replied;
+}
+
+// union {
+//     int32_t myInt32;        // 4 bytes
+//     byte myInt32InBytes[4]; //  mapped onto the same storage as myInt32
+// } myUnion;
+// union {
+//     int32_t myInt32;        // 4 bytes
+//     byte myInt32InBytes[4]; //  mapped onto the same storage as myInt32
+// } myUnion2;
+// union {
+//     uint32_t myuInt32;       // 4 bytes
+//     byte myuInt32InBytes[4]; //  mapped onto the same storage as myInt32
+// } myUnion3;
+
+// union {
+//     uint16_t myuInt16;       // 4 bytes
+//     byte myuInt16InBytes[2]; //  mapped onto the same storage as myuInt16
+// } myUnion16;

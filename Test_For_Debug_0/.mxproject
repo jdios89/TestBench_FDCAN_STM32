@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=/home/tequilajohn/STM32CubeIDE/workspace_1.0.2/Test_For_Debug_0/Inc
+HeaderPath=/home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Inc
 HeaderFiles=stm32h7xx_it.h;stm32h7xx_hal_conf.h;main.h;
-SourcePath=/home/tequilajohn/STM32CubeIDE/workspace_1.0.2/Test_For_Debug_0/Src
+SourcePath=/home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Src
 SourceFiles=stm32h7xx_it.c;stm32h7xx_hal_msp.c;main.c;
 AdvancedFolderStructure=true
 HeaderFileListSize=3

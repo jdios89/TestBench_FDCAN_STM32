@@ -97,7 +97,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-//  MX_FDCAN1_Init();
+  MX_FDCAN1_Init();
   /* USER CODE BEGIN 2 */
 	/* Send dummy message*/
 	TxData[0] = 0x08;
@@ -123,8 +123,6 @@ int main(void)
 		int a = 0;
 	}
   /* USER CODE END 2 */
-
-// code changed
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -287,7 +285,7 @@ static void MX_FDCAN1_Init(void)
   hfdcan1.Init.MessageRAMOffset = 0;
   hfdcan1.Init.StdFiltersNbr = 0;
   hfdcan1.Init.ExtFiltersNbr = 0;
-  hfdcan1.Init.RxFifo0ElmtsNbr = 1;
+  hfdcan1.Init.RxFifo0ElmtsNbr = 0;
   hfdcan1.Init.RxFifo0ElmtSize = FDCAN_DATA_BYTES_8;
   hfdcan1.Init.RxFifo1ElmtsNbr = 0;
   hfdcan1.Init.RxFifo1ElmtSize = FDCAN_DATA_BYTES_8;

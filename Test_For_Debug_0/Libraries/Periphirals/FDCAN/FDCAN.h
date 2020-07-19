@@ -42,6 +42,8 @@ public:
 	void Read();
 	static void MessageCallback(FDCAN_HandleTypeDef *hfdcan);
 	uint8_t Read(uint8_t index);
+	uint32_t FiFoLatestTxRequest();
+	uint32_t isPending(uint32_t txbufferindex);
 
 public:
 	typedef struct hardware_resource_t

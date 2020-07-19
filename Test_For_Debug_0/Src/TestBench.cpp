@@ -28,8 +28,12 @@ void TestBench()
  	FDCAN fdcantest;
  	NANOTEC_CANOpen CANBustest(&fdcantest);
 	uint8_t d0, d1,d2,d3,d4,d5,d6,d7;
+//	fdcantest.WriteMessage(CAN_NMT, 2, CAN_RESET_NODE, 0x1, 0, 0, 0, 0, 0, 0);
 	fdcantest.WriteDummyData(0x8);
+//	HAL_Delay(2);
 	fdcantest.WriteDummyData(0x8);
+	HAL_Delay(1000);
+
 	/* Activate remote node
 	 * on nodeid 1
 	 */
@@ -37,23 +41,26 @@ void TestBench()
 	// Reset Node
 //	fdcantest.WriteMessage(0x00, 2, 0x81, nodeid, 0, 0, 0, 0, 0, 0);
 	fdcantest.WriteMessage(CAN_NMT, 2, CAN_RESET_NODE, nodeid, 0, 0, 0, 0, 0, 0);
-
+	CANBustest.waitForId(0x701, true, 10000);
 	volatile uint32_t FiffillLevel = 0;
 	FiffillLevel = HAL_FDCAN_GetRxFifoFillLevel(&fdcantest._hRes->handle, FDCAN_RX_FIFO0);
-	for (volatile uint8_t i =0; i< FiffillLevel; i++)
-		fdcantest.Read();
+	for (volatile uint8_t i =0; i< FiffillLevel; i++) fdcantest.Read();
+	HAL_Delay(1000);
 
 	// Activate remote node
 	fdcantest.WriteMessage(CAN_NMT, 2, CAN_SWITCH_TO_OPERATIONAL, nodeid, 0, 0, 0, 0, 0, 0);
+	CANBustest.waitForId(0x701, true, 10000);
+
 	FiffillLevel = HAL_FDCAN_GetRxFifoFillLevel(&fdcantest._hRes->handle, FDCAN_RX_FIFO0);
-	for (volatile uint8_t i =0; i< FiffillLevel; i++)
-		fdcantest.Read();
+	for (volatile uint8_t i =0; i< FiffillLevel; i++) fdcantest.Read();
 
 	// Read status of motor
 	Statusword_DataType current_status = 0x0;
     CANBustest.readRegister(nodeid, Statusword, 0x0, &current_status );
-
-	// Select the velocity mode
+//
+    fdcantest.WriteMessage(CAN_NMT, 2, CAN_RESET_NODE, nodeid, 0, 0, 0, 0, 0, 0);
+//
+    // Select the velocity mode
 	uint8_t subind = 0;
 	Modesofoperation_DataType data = 0x02;
 	CANBustest.writeRegister(nodeid, Modesofoperation, subind, data);
@@ -67,6 +74,7 @@ void TestBench()
 	CANBustest.writeRegister(nodeid, Controlword, subind, controlword_data);
 	controlword_data = 0xF;
 	CANBustest.writeRegister(nodeid, Controlword, subind, controlword_data);
+	HAL_Delay(2000);
 	// Stop the motor
 	controlword_data = 0x6;
 	CANBustest.writeRegister(nodeid, Controlword, subind, controlword_data);

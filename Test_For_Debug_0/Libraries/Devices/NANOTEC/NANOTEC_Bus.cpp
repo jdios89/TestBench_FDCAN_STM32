@@ -184,7 +184,7 @@ void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
 {
     readRequest(nodeid, register_index, subindex);
     uint32_t timeout = 2; // 2 ms timeout
-    bool read_confirmed = false;
+    volatile bool read_confirmed = false;
     read_confirmed = waitReply(nodeid, register_index, subindex, timeout, data);
     // delayMicroseconds(300);
     /*
@@ -209,14 +209,24 @@ void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
     }
     */
 }
-//
-//void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
-//                                   uint8_t subindex, int8_t *data);
+
+void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
+                                   uint8_t subindex, int8_t *data)
+{
+	readRequest(nodeid, register_index, subindex);
+	uint32_t timeout = 2; // 2 ms timeout
+	volatile bool read_confirmed = false;
+	read_confirmed = waitReply(nodeid, register_index, subindex, timeout, data);
+}
 
 void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
                                    uint8_t subindex, uint16_t *data)
 {
     readRequest(nodeid, register_index, subindex);
+    volatile uint32_t fifobufferlocation = _bus->FiFoLatestTxRequest();
+    // check if the transaction is pending
+    volatile uint32_t isPending = _bus->isPending(fifobufferlocation);
+
     uint32_t timeout = 2; // 2 ms timeout
     bool read_confirmed = false;
     read_confirmed = waitReply(nodeid, register_index, subindex, timeout, data);
@@ -539,6 +549,37 @@ bool NANOTEC_CANOpen::waitReply(uint8_t nodeid, uint16_t register_index,
         }
         HAL_Delay(1);
         chrono++;
+    }
+    return replied;
+}
+
+bool NANOTEC_CANOpen::waitForId(uint16_t id, bool setTimeout, uint32_t timeout)
+{
+    uint32_t chrono = 0;
+    FDCAN_RxHeaderTypeDef RxHeader;
+    volatile FDCAN_RxHeaderTypeDef vRxHeader;
+    bool replied = false;
+    volatile uint32_t messagesReceived = 0;
+    uint8_t RxData[8];
+    volatile uint8_t vRxData[8];
+
+    while(!replied && chrono < timeout)
+    {
+    	messagesReceived = _bus->GetRxFiFoLevel();
+    	if (messagesReceived > 0)
+    	{
+    		_bus->Read(&RxHeader, RxData);
+    		for (int i = 0; i < 8; i++)
+    			vRxData[i] = RxData[i];
+    		vRxHeader.Identifier = RxHeader.Identifier;
+    	}
+    	if (RxHeader.Identifier == id)
+    	{
+    		replied = true;
+    		break;
+    	}
+    	if (setTimeout) chrono++; // increase only if the timeout is set
+    	HAL_Delay(1);
     }
     return replied;
 }

@@ -88,6 +88,8 @@ public:
 	bool waitReply(uint8_t nodeid, uint16_t register_index,
 				   uint8_t subindex, uint32_t timeout);
 
+	bool waitForId(uint16_t id, bool setTimeout = false, uint32_t timeout = 1);
+
 private:
 	FDCAN * _bus;
 	uint8_t lowByte(uint16_t byte16);

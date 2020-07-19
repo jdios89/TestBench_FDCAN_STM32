@@ -164,6 +164,12 @@ void FDCAN::ConfigurePeripheral()
 		_hRes->handle.Init.NominalSyncJumpWidth = 1;
 		_hRes->handle.Init.NominalTimeSeg1 = 13;
 		_hRes->handle.Init.NominalTimeSeg2 = 2;
+
+		_hRes->handle.Init.NominalPrescaler = 8;
+		_hRes->handle.Init.NominalSyncJumpWidth = 8;
+		_hRes->handle.Init.NominalTimeSeg1 = 13;
+		_hRes->handle.Init.NominalTimeSeg2 = 2;
+
 		_hRes->handle.Init.DataPrescaler = 1;
 		_hRes->handle.Init.DataSyncJumpWidth = 1;
 		_hRes->handle.Init.DataTimeSeg1 = 1;
@@ -171,7 +177,7 @@ void FDCAN::ConfigurePeripheral()
 		_hRes->handle.Init.MessageRAMOffset = 0;
 		_hRes->handle.Init.StdFiltersNbr = 1;
 		_hRes->handle.Init.ExtFiltersNbr = 0;
-		_hRes->handle.Init.RxFifo0ElmtsNbr = 8;
+		_hRes->handle.Init.RxFifo0ElmtsNbr = 20;
 		_hRes->handle.Init.RxFifo0ElmtSize = FDCAN_DATA_BYTES_8;
 		_hRes->handle.Init.RxFifo1ElmtsNbr = 0;
 		_hRes->handle.Init.RxFifo1ElmtSize = FDCAN_DATA_BYTES_8;
@@ -179,7 +185,7 @@ void FDCAN::ConfigurePeripheral()
 		_hRes->handle.Init.RxBufferSize = FDCAN_DATA_BYTES_8;
 		_hRes->handle.Init.TxEventsNbr = 0;
 		_hRes->handle.Init.TxBuffersNbr = 0;
-		_hRes->handle.Init.TxFifoQueueElmtsNbr = 1;
+		_hRes->handle.Init.TxFifoQueueElmtsNbr = 10;
 		_hRes->handle.Init.TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
 		_hRes->handle.Init.TxElmtSize = FDCAN_DATA_BYTES_8;
 
@@ -229,7 +235,7 @@ uint32_t FDCAN::GetRxFiFoLevel()
 }
 void FDCAN::WriteDummyData(uint8_t data)
 {
-	TxHeader.Identifier = 0x321;
+	TxHeader.Identifier = 0x123;
 	TxHeader.DataLength = FDCAN_DLC_BYTES_3;
 	TxHeader.DataLength = FDCAN_DLC_BYTES_8;
 	TxData[0] = 0x08;
@@ -336,6 +342,19 @@ void FDCAN::Read()
 	{
 		Error_Handler();
 	}
+}
+
+uint32_t FDCAN::FiFoLatestTxRequest()
+{
+	return HAL_FDCAN_GetLatestTxFifoQRequestBuffer(&_hRes->handle);
+}
+
+uint32_t FDCAN::isPending(uint32_t txbufferindex)
+{
+	// 0 no pending
+	// 1 pending
+	return HAL_FDCAN_IsTxBufferMessagePending(&_hRes->handle, txbufferindex);
+
 }
 
 void FDCAN::MessageCallback(FDCAN_HandleTypeDef *hfdcan)

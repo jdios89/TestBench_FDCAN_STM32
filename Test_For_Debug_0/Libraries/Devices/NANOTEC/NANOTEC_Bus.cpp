@@ -138,7 +138,7 @@ bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
     bool write_confirmed = false;
     uint32_t id = nodeid + CAN_SDO_CANID_W;
     uint8_t len = 8;
-    uint8_t d0 = CAN_SDOW_DATA_BYTE_2;
+    uint8_t d0 = CAN_SDOW_DATA_BYTE_4;
     uint8_t d1 = lowByte(register_index); //register number for 4 bytes
     uint8_t d2 = highByte(register_index);
     uint8_t d3 = subindex;
@@ -161,7 +161,7 @@ bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
     bool write_confirmed = false;
     uint32_t id = nodeid + CAN_SDO_CANID_W;
     uint8_t len = 8;
-    uint8_t d0 = CAN_SDOW_DATA_BYTE_2;
+    uint8_t d0 = CAN_SDOW_DATA_BYTE_4;
     uint8_t d1 = lowByte(register_index); //register number for 4 bytes
     uint8_t d2 = highByte(register_index);
     uint8_t d3 = subindex;

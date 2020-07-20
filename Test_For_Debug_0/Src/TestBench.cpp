@@ -32,7 +32,6 @@ void TestBench()
 	fdcantest.WriteDummyData(0x8);
 //	HAL_Delay(2);
 	fdcantest.WriteDummyData(0x8);
-	HAL_Delay(1000);
 
 	/* Activate remote node
 	 * on nodeid 1
@@ -41,7 +40,7 @@ void TestBench()
 	// Reset Node
 //	fdcantest.WriteMessage(0x00, 2, 0x81, nodeid, 0, 0, 0, 0, 0, 0);
 	fdcantest.WriteMessage(CAN_NMT, 2, CAN_RESET_NODE, nodeid, 0, 0, 0, 0, 0, 0);
-	HAL_Delay(3000);
+	HAL_Delay(5000);
 	CANBustest.waitForId(0x701, true, 10000);
 	volatile uint32_t FiffillLevel = 0;
 	FiffillLevel = HAL_FDCAN_GetRxFifoFillLevel(&fdcantest._hRes->handle, FDCAN_RX_FIFO0);
@@ -50,9 +49,49 @@ void TestBench()
 	FiffillLevel = HAL_FDCAN_GetRxFifoFillLevel(&fdcantest._hRes->handle, FDCAN_RX_FIFO0);
 	for (volatile uint8_t i =0; i< FiffillLevel; i++) fdcantest.Read();
 	// Activate remote node
-	fdcantest.WriteMessage(CAN_NMT, 2, CAN_SWITCH_TO_OPERATIONAL, nodeid, 0, 0, 0, 0, 0, 0);
-	HAL_Delay(3000);
+//	fdcantest.WriteMessage(CAN_NMT, 2, CAN_SWITCH_TO_OPERATIONAL, nodeid, 0, 0, 0, 0, 0, 0);
+//	CANBustest.waitForId(0x701, true, 10000);
+//	HAL_Delay(3000); // Necessary to give some time to the motor to be ready to operate
+//	/* Clear the CAN bus */
+//	FiffillLevel = HAL_FDCAN_GetRxFifoFillLevel(&fdcantest._hRes->handle, FDCAN_RX_FIFO0);
+//	for (volatile uint8_t i =0; i< FiffillLevel; i++) fdcantest.Read();
+
+	/* Deactivate PDOS */
+	fdcantest.WriteMessage(CAN_NMT, 2, CAN_SWITCH_TO_PREOPERATIONAL, nodeid, 0, 0, 0, 0, 0, 0);
 	CANBustest.waitForId(0x701, true, 10000);
+	HAL_Delay(3000); // Necessary to give some time to the motor to be ready to operate
+	TransmitPDO1CommunicationParameter_1_DataType data_ = 0x01 << 31; // set the bit 31 to 1 of communication parameter of TPDO
+	uint16_t pdoid = 0x180;
+	data_ += pdoid + nodeid; // complete the cobid data
+	CANBustest.writeRegister(nodeid, TransmitPDO1CommunicationParameter,
+			TransmitPDO1CommunicationParameter_1, data_);
+	HAL_Delay(5);
+
+	TransmitPDO2CommunicationParameter_1_DataType data_2 = 0x01 << 31; // set the bit 31 to 1 of communication parameter of TPDO
+	pdoid = 0x280;
+	data_2 += pdoid + nodeid; // complete the cobid data
+	CANBustest.writeRegister(nodeid, TransmitPDO2CommunicationParameter,
+			TransmitPDO2CommunicationParameter_1, data_2);
+	HAL_Delay(5);
+
+	TransmitPDO3CommunicationParameter_1_DataType data_3 = 0x01 << 31; // set the bit 31 to 1 of communication parameter of TPDO
+	pdoid = 0x380;
+	data_3 += pdoid + nodeid; // complete the cobid data
+	CANBustest.writeRegister(nodeid, TransmitPDO3CommunicationParameter,
+			TransmitPDO3CommunicationParameter_1, data_3);
+	HAL_Delay(5);
+
+	TransmitPDO4CommunicationParameter_1_DataType data_4 = 0x01 << 31; // set the bit 31 to 1 of communication parameter of TPDO
+	pdoid = 0x480;
+	data_4 += pdoid + nodeid; // complete the cobid data
+	CANBustest.writeRegister(nodeid, TransmitPDO4CommunicationParameter,
+			TransmitPDO4CommunicationParameter_1, data_4);
+	HAL_Delay(5);
+
+	// Activate remote node
+	fdcantest.WriteMessage(CAN_NMT, 2, CAN_SWITCH_TO_OPERATIONAL, nodeid, 0, 0, 0, 0, 0, 0);
+	CANBustest.waitForId(0x701, true, 10000);
+	HAL_Delay(3000); // Necessary to give some time to the motor to be ready to operate
 	/* Clear the CAN bus */
 	FiffillLevel = HAL_FDCAN_GetRxFifoFillLevel(&fdcantest._hRes->handle, FDCAN_RX_FIFO0);
 	for (volatile uint8_t i =0; i< FiffillLevel; i++) fdcantest.Read();
@@ -73,11 +112,20 @@ void TestBench()
 	// Switch the power state machine to operation enabled
 	Controlword_DataType controlword_data = 0x6;
 	CANBustest.writeRegister(nodeid, Controlword, subind, controlword_data);
+	HAL_Delay(2);
+
 	controlword_data = 0x7;
 	CANBustest.writeRegister(nodeid, Controlword, subind, controlword_data);
+	HAL_Delay(2);
+
 	controlword_data = 0xF;
 	CANBustest.writeRegister(nodeid, Controlword, subind, controlword_data);
-	HAL_Delay(2000);
+	HAL_Delay(2);
+
+	current_status = 0x0;
+	CANBustest.readRegister(nodeid, Statusword, 0x0, &current_status );
+
+	HAL_Delay(10000);
 	// Stop the motor
 	controlword_data = 0x6;
 	CANBustest.writeRegister(nodeid, Controlword, subind, controlword_data);

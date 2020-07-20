@@ -159,7 +159,7 @@ void FDCAN::ConfigurePeripheral()
 		_hRes->handle.Init.Mode = FDCAN_MODE_NORMAL;
 		_hRes->handle.Init.AutoRetransmission = DISABLE;
 		_hRes->handle.Init.TransmitPause = DISABLE;
-		_hRes->handle.Init.ProtocolException = ENABLE;
+		_hRes->handle.Init.ProtocolException = DISABLE;
 		_hRes->handle.Init.NominalPrescaler = 4;
 		_hRes->handle.Init.NominalSyncJumpWidth = 1;
 		_hRes->handle.Init.NominalTimeSeg1 = 13;

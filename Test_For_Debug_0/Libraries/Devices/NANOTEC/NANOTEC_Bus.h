@@ -51,22 +51,22 @@ public:
 					   uint8_t subindex, int32_t data);
 
 	/* Read request from register */
-	void readRegister(uint8_t nodeid, uint16_t register_index,
+	bool readRegister(uint8_t nodeid, uint16_t register_index,
 					  uint8_t subindex, uint8_t *data);
 
-	void readRegister(uint8_t nodeid, uint16_t register_index,
+	bool readRegister(uint8_t nodeid, uint16_t register_index,
 					  uint8_t subindex, int8_t *data);
 
-	void readRegister(uint8_t nodeid, uint16_t register_index,
+	bool readRegister(uint8_t nodeid, uint16_t register_index,
 					  uint8_t subindex, uint16_t *data);
 
-	void readRegister(uint8_t nodeid, uint16_t register_index,
+	bool readRegister(uint8_t nodeid, uint16_t register_index,
 					  uint8_t subindex, int16_t *data);
 
-	void readRegister(uint8_t nodeid, uint16_t register_index,
+	bool readRegister(uint8_t nodeid, uint16_t register_index,
 					  uint8_t subindex, uint32_t *data);
 
-	void readRegister(uint8_t nodeid, uint16_t register_index,
+	bool readRegister(uint8_t nodeid, uint16_t register_index,
 					  uint8_t subindex, int32_t *data);
 
 	void readRequest(uint8_t nodeid, uint16_t register_index,

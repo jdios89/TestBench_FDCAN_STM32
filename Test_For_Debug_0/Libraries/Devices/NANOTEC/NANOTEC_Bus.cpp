@@ -57,7 +57,7 @@ bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
     _bus->WriteMessage(id, len, d0, d1, d2, d3, d4, d5, d6, d7);
     // Wait for a reply, set timeout of 2 ms
     // HAL_Delay(1);
-    uint32_t timeout = 2;
+    uint32_t timeout = 3;
     /* wait for reply */
     write_confirmed = waitReply(nodeid, register_index, subindex, timeout);
     return write_confirmed;
@@ -80,7 +80,7 @@ bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
     _bus->WriteMessage(id, len, d0, d1, d2, d3, d4, d5, d6, d7);
     // Wait for a reply, set timeout of 2 ms
     // HAL_Delay(1);
-    uint32_t timeout = 2;
+    uint32_t timeout = 3;
     /* wait for reply */
     write_confirmed = waitReply(nodeid, register_index, subindex, timeout);
     return write_confirmed;
@@ -103,7 +103,7 @@ bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
     _bus->WriteMessage(id, len, d0, d1, d2, d3, d4, d5, d6, d7);
     // Wait for a reply, set timeout of 2 ms
     // HAL_Delay(1);
-    uint32_t timeout = 2;
+    uint32_t timeout = 3;
     /* wait for reply */
     write_confirmed = waitReply(nodeid, register_index, subindex, timeout);
     return write_confirmed;
@@ -126,7 +126,7 @@ bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
     _bus->WriteMessage(id, len, d0, d1, d2, d3, d4, d5, d6, d7);
     // Wait for a reply, set timeout of 2 ms
     // HAL_Delay(1);
-    uint32_t timeout = 2;
+    uint32_t timeout = 3;
     /* wait for reply */
     write_confirmed = waitReply(nodeid, register_index, subindex, timeout);
     return write_confirmed;
@@ -149,7 +149,7 @@ bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
     _bus->WriteMessage(id, len, d0, d1, d2, d3, d4, d5, d6, d7);
     // Wait for a reply, set timeout of 2 ms
     // HAL_Delay(1);
-    uint32_t timeout = 2;
+    uint32_t timeout = 3;
     /* wait for reply */
     write_confirmed = waitReply(nodeid, register_index, subindex, timeout);
     return write_confirmed;
@@ -172,20 +172,21 @@ bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
     _bus->WriteMessage(id, len, d0, d1, d2, d3, d4, d5, d6, d7);
     // Wait for a reply, set timeout of 2 ms
     // HAL_Delay(1);
-    uint32_t timeout = 2;
+    uint32_t timeout = 3;
     /* wait for reply */
     write_confirmed = waitReply(nodeid, register_index, subindex, timeout);
     return write_confirmed;
 }
 
 /* Read request from register */
-void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
+bool NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
                                    uint8_t subindex, uint8_t *data)
 {
     readRequest(nodeid, register_index, subindex);
     uint32_t timeout = 2; // 2 ms timeout
     volatile bool read_confirmed = false;
     read_confirmed = waitReply(nodeid, register_index, subindex, timeout, data);
+    return read_confirmed;
     // delayMicroseconds(300);
     /*
     bool replied = false;
@@ -210,16 +211,17 @@ void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
     */
 }
 
-void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
+bool NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
                                    uint8_t subindex, int8_t *data)
 {
 	readRequest(nodeid, register_index, subindex);
 	uint32_t timeout = 2; // 2 ms timeout
 	volatile bool read_confirmed = false;
 	read_confirmed = waitReply(nodeid, register_index, subindex, timeout, data);
+	return read_confirmed;
 }
 
-void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
+bool NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
                                    uint8_t subindex, uint16_t *data)
 {
     readRequest(nodeid, register_index, subindex);
@@ -230,6 +232,7 @@ void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
     uint32_t timeout = 2; // 2 ms timeout
     bool read_confirmed = false;
     read_confirmed = waitReply(nodeid, register_index, subindex, timeout, data);
+    return read_confirmed;
     // delayMicroseconds(300);
     /*
     bool replied = false;
@@ -260,31 +263,34 @@ void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
     */
 }
 
-void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
+bool NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
                                    uint8_t subindex, int16_t *data)
 {
     readRequest(nodeid, register_index, subindex);
     uint32_t timeout = 2; // 2 ms timeout
     bool read_confirmed = false;
     read_confirmed = waitReply(nodeid, register_index, subindex, timeout, data);
+    return read_confirmed;
 }
 
-void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
+bool NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
                                    uint8_t subindex, uint32_t *data)
 {
     readRequest(nodeid, register_index, subindex);
     uint32_t timeout = 2; // 2 ms timeout
     bool read_confirmed = false;
     read_confirmed = waitReply(nodeid, register_index, subindex, timeout, data);
+    return read_confirmed;
 }
 
-void NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
+bool NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
                                    uint8_t subindex, int32_t *data)
 {
     readRequest(nodeid, register_index, subindex);
     uint32_t timeout = 2; // 2 ms timeout
     bool read_confirmed = false;
     read_confirmed = waitReply(nodeid, register_index, subindex, timeout, data);
+    return read_confirmed;
 }
 
 void NANOTEC_CANOpen::readRequest(uint8_t nodeid, uint16_t register_index,
@@ -572,12 +578,13 @@ bool NANOTEC_CANOpen::waitForId(uint16_t id, bool setTimeout, uint32_t timeout)
     		for (int i = 0; i < 8; i++)
     			vRxData[i] = RxData[i];
     		vRxHeader.Identifier = RxHeader.Identifier;
+    		if (RxHeader.Identifier == id)
+    		{
+    		    		replied = true;
+    		    		break;
+    	   	}
     	}
-    	if (RxHeader.Identifier == id)
-    	{
-    		replied = true;
-    		break;
-    	}
+
     	if (setTimeout) chrono++; // increase only if the timeout is set
     	HAL_Delay(1);
     }

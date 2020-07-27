@@ -196,6 +196,9 @@ void FDCAN::ConfigurePeripheral()
 		_hRes->handle.Init.TxFifoQueueElmtsNbr = 1;
 		_hRes->handle.Init.TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
 		_hRes->handle.Init.TxElmtSize = FDCAN_DATA_BYTES_8;
+		/* delay is dataseg1 * prescale */
+		HAL_FDCAN_ConfigTxDelayCompensation(&_hRes->handle, 7, 0);
+		HAL_FDCAN_EnableTxDelayCompensation(&_hRes->handle);
 
 		FDCAN_FilterTypeDef sFilterConfig;
 		/* Configure Rx filter */
@@ -310,6 +313,8 @@ void FDCAN::WriteMessage(uint32_t id, uint8_t len, uint8_t d0, uint8_t d1,
 	TxData[5] = d5;
 	TxData[6] = d6;
 	TxData[7] = d7;
+	// Send message if the fifo is ready
+	while(isPending(FiFoLatestTxRequest())){}
 	if (HAL_FDCAN_AddMessageToTxFifoQ(&_hRes->handle, &TxHeader, TxData) != HAL_OK)
 	{
 		TxData[1] = 0x2;

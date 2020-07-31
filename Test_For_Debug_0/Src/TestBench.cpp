@@ -34,6 +34,7 @@ void TestBench()
 	uint8_t d0, d1,d2,d3,d4,d5,d6,d7;
 	fdcantest.WriteDummyData(0x8);
 	HAL_Delay(1);
+//	while(1){}
 	fdcantest.WriteDummyData(0x8);
 	HAL_Delay(1);
 	/* Activate remote node
@@ -77,6 +78,7 @@ void TestBench()
 		tri_inc++;
 		HAL_Delay(3);
 	}
+	HAL_Delay(1);
 
 	tries = 10;
 	tri_inc = 0;
@@ -91,6 +93,7 @@ void TestBench()
 		tri_inc++;
 		HAL_Delay(3);
 	}
+	HAL_Delay(1);
 
 	tries = 10;
 	tri_inc = 0;
@@ -105,6 +108,7 @@ void TestBench()
 		tri_inc++;
 		HAL_Delay(3);
 	}
+	HAL_Delay(1);
 
 	tries = 10;
 	tri_inc = 0;
@@ -119,6 +123,7 @@ void TestBench()
 		tri_inc++;
 		HAL_Delay(3);
 	}
+	HAL_Delay(1);
 
 	// Activate remote node
 	fdcantest.WriteMessage(CAN_NMT, 2, CAN_SWITCH_TO_OPERATIONAL, nodeid, 0, 0, 0, 0, 0, 0);
@@ -127,6 +132,7 @@ void TestBench()
 	/* Clear the CAN bus */
 	FiffillLevel = HAL_FDCAN_GetRxFifoFillLevel(&fdcantest._hRes->handle, FDCAN_RX_FIFO0);
 	for (volatile uint8_t i =0; i< FiffillLevel; i++) fdcantest.Read();
+	HAL_Delay(1);
 
 	// Read status of motor
 	Statusword_DataType current_status = 0x0;
@@ -141,6 +147,7 @@ void TestBench()
 		tri_inc++;
 	}
 	// Select the velocity mode
+	HAL_Delay(1);
 
 	uint8_t subind = 0;
 	Modesofoperation_DataType data = 0x02;
@@ -154,6 +161,8 @@ void TestBench()
 		HAL_Delay(3);
 		tri_inc++;
 	}
+	HAL_Delay(1);
+
 	// Write desired speed
 	vltargetvelocity_DataType desvel = 0xC8;
 	tries = 3;
@@ -166,6 +175,8 @@ void TestBench()
 		HAL_Delay(2);
 		tri_inc++;
 	}
+	HAL_Delay(1);
+
 	// Switch the power state machine to operation enabled
 	Controlword_DataType controlword_data = 0x6;
 	tries = 3;
@@ -179,6 +190,7 @@ void TestBench()
 		tri_inc++;
 	}
 	// Read the status word to confirm that the motor is ready to switch on
+	HAL_Delay(1);
 
 	uint8_t wait_for_statuschange = 5;
 	uint8_t wfs_inc = 0;
@@ -212,6 +224,7 @@ void TestBench()
 		HAL_Delay(2);
 	}
 	// TODO: If status not change check again
+	HAL_Delay(1);
 
 	controlword_data = 0x7;
 	tries = 5;
@@ -224,6 +237,7 @@ void TestBench()
 		HAL_Delay(2);
 		tri_inc++;
 	}
+	HAL_Delay(1);
 
 	wait_for_statuschange = 5;
 	wfs_inc = 0;
@@ -256,6 +270,7 @@ void TestBench()
 		wfs_inc++;
 		HAL_Delay(2);
 	}
+	HAL_Delay(1);
 
 	controlword_data = 0xF;
 	tries = 3;
@@ -268,6 +283,7 @@ void TestBench()
 		HAL_Delay(2);
 		tri_inc++;
 	}
+	HAL_Delay(1);
 
 	wait_for_statuschange = 5;
 	wfs_inc = 0;
@@ -300,6 +316,7 @@ void TestBench()
 		wfs_inc++;
 		HAL_Delay(2);
 	}
+	HAL_Delay(1);
 
 	current_status = 0x0;
 	tri_inc = 0;
@@ -370,11 +387,59 @@ void TestBench()
 		tri_inc++;
 	}
 
-
+	// Write desired speed
+	desvel = 150;
+	tries = 3;
+	tri_inc = 0;
+	confirmation_done = false;
+	while( !confirmation_done && tri_inc < tries )
+	{
+		confirmation_done = CANBustest.writeRegister(nodeid, vltargetvelocity, subind, desvel);
+		if (confirmation_done) break;
+		HAL_Delay(2);
+		tri_inc++;
+	}
+	HAL_Delay(1000);
+	desvel = -150;
+	tries = 3;
+	tri_inc = 0;
+	confirmation_done = false;
+	while( !confirmation_done && tri_inc < tries )
+	{
+		confirmation_done = CANBustest.writeRegister(nodeid, vltargetvelocity, subind, desvel);
+		if (confirmation_done) break;
+		HAL_Delay(2);
+		tri_inc++;
+	}
+	HAL_Delay(1000);
+	desvel = 150;
+	tries = 3;
+	tri_inc = 0;
+	confirmation_done = false;
+	while( !confirmation_done && tri_inc < tries )
+	{
+		confirmation_done = CANBustest.writeRegister(nodeid, vltargetvelocity, subind, desvel);
+		if (confirmation_done) break;
+		HAL_Delay(2);
+		tri_inc++;
+	}
+	HAL_Delay(1000);
+	desvel = 150;
+	tries = 3;
+	tri_inc = 0;
+	confirmation_done = false;
+	while( !confirmation_done && tri_inc < tries )
+	{
+		confirmation_done = CANBustest.writeRegister(nodeid, vltargetvelocity, subind, desvel);
+		if (confirmation_done) break;
+		HAL_Delay(2);
+		tri_inc++;
+	}
+	HAL_Delay(1000);
 
 	/* Profile velocities end */
 
-	HAL_Delay(4000);
+//	HAL_Delay(4000);
 	// Stop the motor
 	controlword_data = 0x6;
 	tri_inc = 0;
@@ -386,9 +451,16 @@ void TestBench()
 		HAL_Delay(2);
 		tri_inc++;
 	}
+	HAL_Delay(1);
+
 	fdcantest.WriteDummyData(0x8);
+	HAL_Delay(1);
 	fdcantest.WriteDummyData(0x8);
+	HAL_Delay(1);
+
 	fdcantest.WriteDummyData(0x0);
+	HAL_Delay(1);
+
 	// Select the velocity mode
 	//
 	//	uint8_t lmodesofoperation = Modesofoperation & 0xFF;

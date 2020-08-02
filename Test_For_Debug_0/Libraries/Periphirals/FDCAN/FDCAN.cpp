@@ -317,7 +317,7 @@ void FDCAN::WriteMessage(uint32_t id, uint8_t len, uint8_t d0, uint8_t d1,
 	TxData[6] = d6;
 	TxData[7] = d7;
 	// Send message if the fifo is ready
-//	while(isPending(FiFoLatestTxRequest())){}
+	while(isPending(FiFoLatestTxRequest())){}
 	if (HAL_FDCAN_AddMessageToTxFifoQ(&_hRes->handle, &TxHeader, TxData) != HAL_OK)
 	{
 		TxData[1] = 0x2;

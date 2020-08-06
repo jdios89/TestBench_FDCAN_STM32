@@ -116,12 +116,20 @@ void FDCAN::InitPeripheral()
 							PD1     ------> FDCAN1_TX
 							PD0     ------> FDCAN1_RX
 			 */
-			GPIO_InitStruct.Pin = FDCAN1_RX_Pin | FDCAN1_TX_Pin;
-			GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-			GPIO_InitStruct.Pull = GPIO_NOPULL;
+			GPIO_InitStruct.Pin = FDCAN1_TX_Pin;
+			GPIO_InitStruct.Mode = GPIO_MODE_AF_PP; // Alternate Function Push Pull
+			GPIO_InitStruct.Pull = GPIO_PULLUP;
 			GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 			GPIO_InitStruct.Alternate = GPIO_AF9_FDCAN1;
 			HAL_GPIO_Init(FDCAN1_TX_GPIO_Port, &GPIO_InitStruct);
+
+
+			GPIO_InitStruct.Pin = FDCAN1_RX_Pin;
+			GPIO_InitStruct.Mode = GPIO_MODE_AF_PP; // Alternate Function Push Pull
+			GPIO_InitStruct.Pull = GPIO_PULLUP;
+			GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+			GPIO_InitStruct.Alternate = GPIO_AF9_FDCAN1;
+			HAL_GPIO_Init(FDCAN1_RX_GPIO_Port, &GPIO_InitStruct);
 
 			/* Peripheral clock enable*/
 			__HAL_RCC_FDCAN_CLK_ENABLE();
@@ -157,9 +165,9 @@ void FDCAN::ConfigurePeripheral()
 		}
 		_hRes->handle.Init.FrameFormat = FDCAN_FRAME_CLASSIC;
 		_hRes->handle.Init.Mode = FDCAN_MODE_NORMAL;
-		_hRes->handle.Init.AutoRetransmission = DISABLE;
+		_hRes->handle.Init.AutoRetransmission = ENABLE;
 		_hRes->handle.Init.TransmitPause = DISABLE;
-		_hRes->handle.Init.ProtocolException = DISABLE;
+		_hRes->handle.Init.ProtocolException = ENABLE;
 		/* for 64 Mhz */
 		_hRes->handle.Init.NominalPrescaler = 4;
 		_hRes->handle.Init.NominalSyncJumpWidth = 1;
@@ -175,13 +183,33 @@ void FDCAN::ConfigurePeripheral()
 		/* for 8 Mhz*/
 		_hRes->handle.Init.NominalPrescaler = 1;
 		_hRes->handle.Init.NominalSyncJumpWidth = 1;
-		_hRes->handle.Init.NominalTimeSeg1 = 6;
-		_hRes->handle.Init.NominalTimeSeg2 = 1;
+		_hRes->handle.Init.NominalTimeSeg1 = 5; //6;
+		_hRes->handle.Init.NominalTimeSeg2 = 2; //1;
 
-		_hRes->handle.Init.DataPrescaler = 1;
-		_hRes->handle.Init.DataSyncJumpWidth = 1;
-		_hRes->handle.Init.DataTimeSeg1 = 6; // 6
-		_hRes->handle.Init.DataTimeSeg2 = 1;
+		/* for 10 Mhz */
+		_hRes->handle.Init.NominalPrescaler = 1;
+		_hRes->handle.Init.NominalSyncJumpWidth = 1;
+		_hRes->handle.Init.NominalTimeSeg1 = 8; //8; //6;
+		_hRes->handle.Init.NominalTimeSeg2 = 1; //1; //1;
+
+		/* for 16 Mhz */
+//		_hRes->handle.Init.NominalPrescaler = 2;
+//		_hRes->handle.Init.NominalSyncJumpWidth = 1;
+//		_hRes->handle.Init.NominalTimeSeg1 = 6; //8; //6;
+//		_hRes->handle.Init.NominalTimeSeg2 = 1; //1; //1;
+
+//		/* for 40 Mhz */
+		_hRes->handle.Init.NominalPrescaler = 0x1;
+		_hRes->handle.Init.NominalSyncJumpWidth = 0x8;
+		_hRes->handle.Init.NominalTimeSeg1 = 0x1F; //8; //6;
+		_hRes->handle.Init.NominalTimeSeg2 = 0x8; //1; //1;
+
+
+//		_hRes->handle.Init.DataPrescaler = 2;
+//		_hRes->handle.Init.DataSyncJumpWidth = 2;
+//		_hRes->handle.Init.DataTimeSeg1 = 6; // 6
+//		_hRes->handle.Init.DataTimeSeg2 = 1; //1;
+
 		_hRes->handle.Init.MessageRAMOffset = 0;
 		_hRes->handle.Init.StdFiltersNbr = 1;
 		_hRes->handle.Init.ExtFiltersNbr = 0;
@@ -192,15 +220,16 @@ void FDCAN::ConfigurePeripheral()
 		_hRes->handle.Init.RxBuffersNbr = 0;
 		_hRes->handle.Init.RxBufferSize = FDCAN_DATA_BYTES_8;
 		_hRes->handle.Init.TxEventsNbr = 0;
-		_hRes->handle.Init.TxBuffersNbr = 0;
+		_hRes->handle.Init.TxBuffersNbr = 1;
 		_hRes->handle.Init.TxFifoQueueElmtsNbr = 1;
 		_hRes->handle.Init.TxFifoQueueMode = FDCAN_TX_FIFO_OPERATION;
 		_hRes->handle.Init.TxElmtSize = FDCAN_DATA_BYTES_8;
 		/* delay is dataseg1 * prescale */
-		HAL_FDCAN_ConfigTxDelayCompensation(&_hRes->handle, 7, 0);
-		HAL_FDCAN_ConfigTxDelayCompensation(&_hRes->handle, 16, 5);
-		HAL_FDCAN_ConfigTxDelayCompensation(&_hRes->handle, 1, 0);
-//		HAL_FDCAN_ConfigTxDelayCompensation(&_hRes->handle, 3, 0);
+//		HAL_FDCAN_ConfigTxDelayCompensation(&_hRes->handle, 7, 0);
+//		HAL_FDCAN_ConfigTxDelayCompensation(&_hRes->handle, 16, 5);
+//		HAL_FDCAN_ConfigTxDelayCompensation(&_hRes->handle, 2, 0); // for 16Mhz clock source
+		HAL_FDCAN_ConfigTxDelayCompensation(&_hRes->handle, 5, 0); // for 40Mhz clock source
+		HAL_FDCAN_ConfigTxDelayCompensation(&_hRes->handle, 3, 0); // for 40Mhz clock source
 		HAL_FDCAN_EnableTxDelayCompensation(&_hRes->handle);
 
 		FDCAN_FilterTypeDef sFilterConfig;
@@ -237,11 +266,11 @@ void FDCAN::ConfigurePeripheral()
 			/* Notification Error */
 			Error_Handler();
 		}
-		if (HAL_FDCAN_ActivateNotification(&_hRes->handle, FDCAN_IT_TX_COMPLETE, 0) != HAL_OK)
-		{
-			/* Notification Error */
-			Error_Handler();
-		}
+//		if (HAL_FDCAN_ActivateNotification(&_hRes->handle, FDCAN_IT_TX_COMPLETE, 0) != HAL_OK)
+//		{
+//			/* Notification Error */
+//			Error_Handler();
+//		}
 	}
 	if (!_hRes)
 		return; /* only here works */
@@ -317,7 +346,7 @@ void FDCAN::WriteMessage(uint32_t id, uint8_t len, uint8_t d0, uint8_t d1,
 	TxData[6] = d6;
 	TxData[7] = d7;
 	// Send message if the fifo is ready
-	while(isPending(FiFoLatestTxRequest())){}
+//	while(isPending(FiFoLatestTxRequest())){}
 	if (HAL_FDCAN_AddMessageToTxFifoQ(&_hRes->handle, &TxHeader, TxData) != HAL_OK)
 	{
 		TxData[1] = 0x2;

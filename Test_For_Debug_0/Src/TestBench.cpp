@@ -54,6 +54,10 @@ void TestBench()
 	fdcantest.WriteMessage(0x601, 8, 0x40, 0x41, 0x60, 0x11, 0, 0, 0, 0);HAL_Delay(1);
 	fdcantest.WriteMessage(0x601, 8, 0x40, 0x41, 0x60, 0x12, 0, 0, 0, 0);HAL_Delay(1);
 
+	/* Empty buffer */
+	uint8_t messages_received = fdcantest.GetRxFiFoLevel();
+	for (int i = 0; i < messages_received; i++) fdcantest.Read();
+
 	fdcantest.WriteDummyData(0x8);
 	HAL_Delay(1);
 	//	while(1){}3

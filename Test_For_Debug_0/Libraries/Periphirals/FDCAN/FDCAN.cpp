@@ -193,16 +193,29 @@ void FDCAN::ConfigurePeripheral()
 		_hRes->handle.Init.NominalTimeSeg2 = 1; //1; //1;
 
 		/* for 16 Mhz */
-//		_hRes->handle.Init.NominalPrescaler = 2;
-//		_hRes->handle.Init.NominalSyncJumpWidth = 1;
-//		_hRes->handle.Init.NominalTimeSeg1 = 6; //8; //6;
-//		_hRes->handle.Init.NominalTimeSeg2 = 1; //1; //1;
+		_hRes->handle.Init.NominalPrescaler = 2;
+		_hRes->handle.Init.NominalSyncJumpWidth = 1;
+		_hRes->handle.Init.NominalTimeSeg1 = 6; //8; //6;
+		_hRes->handle.Init.NominalTimeSeg2 = 1; //1; //1;
 
-//		/* for 40 Mhz */
-		_hRes->handle.Init.NominalPrescaler = 0x1;
+		/* for 60 Mhz */
+		_hRes->handle.Init.NominalPrescaler = 6;
+		_hRes->handle.Init.NominalSyncJumpWidth = 8;
+		_hRes->handle.Init.NominalTimeSeg1 = 8; //8; //6;
+		_hRes->handle.Init.NominalTimeSeg2 = 1; //1; //1;
+
+		/* for 40 Mhz webpage */
+		_hRes->handle.Init.NominalPrescaler = 0x4; // Tq = 20
 		_hRes->handle.Init.NominalSyncJumpWidth = 0x8;
-		_hRes->handle.Init.NominalTimeSeg1 = 0x1F; //8; //6;
-		_hRes->handle.Init.NominalTimeSeg2 = 0x8; //1; //1;
+		_hRes->handle.Init.NominalTimeSeg1 = 0x8; //8; //6;
+		_hRes->handle.Init.NominalTimeSeg2 = 0x1; //1; //1;
+
+
+//		/* for 40 Mhz example STM */
+//		_hRes->handle.Init.NominalPrescaler = 0x1;
+//		_hRes->handle.Init.NominalSyncJumpWidth = 0x8;
+//		_hRes->handle.Init.NominalTimeSeg1 = 0x1F; //8; //6;
+//		_hRes->handle.Init.NominalTimeSeg2 = 0x8; //1; //1;
 
 
 //		_hRes->handle.Init.DataPrescaler = 2;
@@ -228,9 +241,10 @@ void FDCAN::ConfigurePeripheral()
 //		HAL_FDCAN_ConfigTxDelayCompensation(&_hRes->handle, 7, 0);
 //		HAL_FDCAN_ConfigTxDelayCompensation(&_hRes->handle, 16, 5);
 //		HAL_FDCAN_ConfigTxDelayCompensation(&_hRes->handle, 2, 0); // for 16Mhz clock source
-		HAL_FDCAN_ConfigTxDelayCompensation(&_hRes->handle, 5, 0); // for 40Mhz clock source
-		HAL_FDCAN_ConfigTxDelayCompensation(&_hRes->handle, 3, 0); // for 40Mhz clock source
-		HAL_FDCAN_EnableTxDelayCompensation(&_hRes->handle);
+//		HAL_FDCAN_ConfigTxDelayCompensation(&_hRes->handle, 5, 0); // for 40Mhz clock source
+		HAL_FDCAN_ConfigTxDelayCompensation(&_hRes->handle, 2, 0); // for 40Mhz clock source
+		HAL_FDCAN_ConfigTxDelayCompensation(&_hRes->handle, 2, 0); // for 40Mhz clock source
+//		HAL_FDCAN_EnableTxDelayCompensation(&_hRes->handle);
 
 		FDCAN_FilterTypeDef sFilterConfig;
 		/* Configure Rx filter */
@@ -354,7 +368,7 @@ void FDCAN::WriteMessage(uint32_t id, uint8_t len, uint8_t d0, uint8_t d1,
 		Error_Handler();
 	}
 //	while(isPending(FiFoLatestTxRequest())){ HAL_Delay(1);}
-	HAL_Delay(1);
+//	HAL_Delay(1);
 	//	if(HAL_FDCAN_AddMessageToTxFifoQ(&_hRes->handle, &TxHeader, TxData) != HAL_OK)
 	//		{
 	//			TxData[1] = 0x2;

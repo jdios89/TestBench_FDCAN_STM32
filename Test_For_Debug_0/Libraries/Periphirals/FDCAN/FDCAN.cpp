@@ -166,7 +166,7 @@ void FDCAN::ConfigurePeripheral()
 		_hRes->handle.Init.FrameFormat = FDCAN_FRAME_CLASSIC;
 		_hRes->handle.Init.Mode = FDCAN_MODE_NORMAL;
 		_hRes->handle.Init.AutoRetransmission = ENABLE;
-		_hRes->handle.Init.TransmitPause = DISABLE;
+		_hRes->handle.Init.TransmitPause = ENABLE; // DISABLE;
 		_hRes->handle.Init.ProtocolException = ENABLE;
 		/* for 64 Mhz */
 		_hRes->handle.Init.NominalPrescaler = 4;
@@ -212,16 +212,23 @@ void FDCAN::ConfigurePeripheral()
 
 
 //		/* for 40 Mhz example STM */
-//		_hRes->handle.Init.NominalPrescaler = 0x1;
-//		_hRes->handle.Init.NominalSyncJumpWidth = 0x8;
-//		_hRes->handle.Init.NominalTimeSeg1 = 0x1F; //8; //6;
-//		_hRes->handle.Init.NominalTimeSeg2 = 0x8; //1; //1;
+		_hRes->handle.Init.NominalPrescaler = 0x1;
+		_hRes->handle.Init.NominalSyncJumpWidth = 0x8;
+		_hRes->handle.Init.NominalTimeSeg1 = 0x1F; //8; //6;
+		_hRes->handle.Init.NominalTimeSeg2 = 0x8; //1; //1;
+
+		/* for 50 Mhz example STM */
+		_hRes->handle.Init.NominalPrescaler = 5;
+		_hRes->handle.Init.NominalSyncJumpWidth = 7;
+		_hRes->handle.Init.NominalTimeSeg1 = 10; //8; //6;
+		_hRes->handle.Init.NominalTimeSeg2 = 1; //1; //1;
 
 
-//		_hRes->handle.Init.DataPrescaler = 2;
-//		_hRes->handle.Init.DataSyncJumpWidth = 2;
-//		_hRes->handle.Init.DataTimeSeg1 = 6; // 6
-//		_hRes->handle.Init.DataTimeSeg2 = 1; //1;
+
+//		_hRes->handle.Init.DataPrescaler = 1;
+//		_hRes->handle.Init.DataSyncJumpWidth = 29;
+//		_hRes->handle.Init.DataTimeSeg1 = 20; // 6
+//		_hRes->handle.Init.DataTimeSeg2 = 20; //1;
 
 		_hRes->handle.Init.MessageRAMOffset = 0;
 		_hRes->handle.Init.StdFiltersNbr = 1;
@@ -244,7 +251,7 @@ void FDCAN::ConfigurePeripheral()
 //		HAL_FDCAN_ConfigTxDelayCompensation(&_hRes->handle, 5, 0); // for 40Mhz clock source
 		HAL_FDCAN_ConfigTxDelayCompensation(&_hRes->handle, 2, 0); // for 40Mhz clock source
 		HAL_FDCAN_ConfigTxDelayCompensation(&_hRes->handle, 2, 0); // for 40Mhz clock source
-//		HAL_FDCAN_EnableTxDelayCompensation(&_hRes->handle);
+		HAL_FDCAN_EnableTxDelayCompensation(&_hRes->handle);
 
 		FDCAN_FilterTypeDef sFilterConfig;
 		/* Configure Rx filter */

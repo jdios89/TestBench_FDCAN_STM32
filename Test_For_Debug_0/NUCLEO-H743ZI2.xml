@@ -12,8 +12,8 @@
 <targetDefinitions>
   <board id="nucleo-h743zi2">
     <name>NUCLEO-H743ZI2</name>
-    <dbgIF>SWD</dbgIF>
     <dbgIF>JTAG</dbgIF>
+    <dbgIF>SWD</dbgIF>
     <dbgDEV>ST-Link</dbgDEV>
     <mcuId>stm32h743zitx</mcuId>
   </board>

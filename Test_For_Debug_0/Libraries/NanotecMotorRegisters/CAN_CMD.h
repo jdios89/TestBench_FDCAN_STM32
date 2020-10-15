@@ -31,4 +31,6 @@
 #define CAN_WRITE_RESPONSE 0x60
 #define CAN_ERROR_RESPONSE 0x80
 
+#define SYNC_COBID 0x80
+
 #endif

@@ -90,7 +90,7 @@ public:
 
 	bool waitForId(uint16_t id, bool setTimeout = false, uint32_t timeout = 1);
 
-private:
+public:
 	FDCAN * _bus;
 	uint8_t lowByte(uint16_t byte16);
 	uint8_t highByte(uint16_t byte16);

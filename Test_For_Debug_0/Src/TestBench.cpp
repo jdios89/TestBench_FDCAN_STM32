@@ -21,6 +21,24 @@
 #include "NANOTEC_Bus.h"
 #include "NANOTEC.h"
 
+// Variables for small control for PID
+float pos_d[3] = {0.57, 0.23, 0.12}; // desired position in radians
+float pos_l[3] = {0.0, 0.0, 0.0}; // last position in radians
+float pos[3] = {0.0, 0.0, 0.0};
+float error_pos[3] = {0.0, 0.0, 0.0}; // error
+float error_pos_l[3] = {0.0, 0.0, 0.0}; // last error
+float dt = 0.005; // timestep 10 ms
+float kp = 0.18;
+float kd = 0.01;
+float ki = 0.001;
+float kp_c[3] = {0.0, 0.0, 0.0};
+float kd_c[3] = {0.0, 0.0, 0.0};
+float ki_c[3] = {0.0, 0.0, 0.0};
+float output[3] = {0.0, 0.0, 0.0};
+
+
+// void delay(uint32_t time_ms)  { HAL_Delay(time_ms);};
+
 void TestBench()
 {
 	FDCAN_RxHeaderTypeDef RxHeader;
@@ -28,8 +46,44 @@ void TestBench()
 	FDCAN fdcantest; // port object
 	NANOTEC_CANOpen CANBustest(&fdcantest); // port communication object
 	// 	NANOTEC Motor(&fdcantest); // motor object
-	NANOTEC(&fdcantest,
-			(int8_t) 1 , 2.0f, 1000.0f, 1.0f, 4000.0, 30.0); // platform specific constructor
+	// NANOTEC(can_object, motor_id, max_current, current_constant Nm/A, Gear ratio, TicksperRev, MaxMotorSpeed)
+	NANOTEC NANOTEC_1(&fdcantest,
+			(uint8_t) 0x1 , 2.0f, 3.54f/4.2f, 1.0f, 10000.0, 30.0); // platform specific constructor
+    NANOTEC_1.Configure();
+    NANOTEC NANOTECS[3] = {NANOTEC(&fdcantest,(uint8_t) 0x1 , 2.0f, 3.54f/4.2f, 1.0f, 10000.0, 30.0),
+    		               NANOTEC(&fdcantest,(uint8_t) 0x2 , 2.0f, 3.54f/4.2f, 1.0f, 10000.0, 30.0),
+			               NANOTEC(&fdcantest,(uint8_t) 0x3 , 2.0f, 3.54f/4.2f, 1.0f, 10000.0, 30.0)};
+    for(int i = 0; i < 3; i++) NANOTECS[i].Configure();
+    // Compute control
+    while(true)
+    {
+    	// Reference generator
+    	float amplitude[3] = {0.5, 1.0, 1.6};
+    	float freq[3] = {0.23, 0.5, 1.0};
+    	for (int i = 0; i < 3; i++)
+    	{
+    		float PI = 3.14159265;
+    		float time_ms_ = (float) HAL_GetTick(); //uint32_t
+    		pos_d[i] = amplitude[i] * sinf(2.0f*PI*freq[i] * time_ms_ / 1000.0f);
+    	}
+
+    	for (int i = 0; i < 3; i++)
+    	{
+			pos_l[i] = pos[i];
+			pos[i] = NANOTECS[i].GetAngle();
+			error_pos_l[i] = error_pos[i];
+			error_pos[i] = pos_d[i] - pos[i];
+			kp_c[i] = kp * error_pos[i];
+			kd_c[i] = 100 * kd * (error_pos[i] - error_pos_l[i]);
+			ki_c[i] = 0;
+			output[i] = kp_c[i] + kd_c[i] + ki_c[i];
+			NANOTECS[i].SetTorque(output[i]);
+    	}
+    	float time_ms = dt * 1000.0;
+		HAL_Delay(int(time_ms));
+    }
+
+
 
 	uint8_t d0, d1,d2,d3,d4,d5,d6,d7;
 

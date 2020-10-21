@@ -28,7 +28,7 @@ float pos[3] = {0.0, 0.0, 0.0};
 float error_pos[3] = {0.0, 0.0, 0.0}; // error
 float error_pos_l[3] = {0.0, 0.0, 0.0}; // last error
 float dt = 0.005; // timestep 10 ms
-float kp = 0.18;
+float kp = 0.18f/2.0f;
 float kd = 0.01;
 float ki = 0.001;
 float kp_c[3] = {0.0, 0.0, 0.0};
@@ -58,7 +58,7 @@ void TestBench()
     while(true)
     {
     	// Reference generator
-    	float amplitude[3] = {0.5, 1.0, 1.6};
+    	float amplitude[3] = {3.5, 1.0, 1.6};
     	float freq[3] = {0.23, 0.5, 1.0};
     	for (int i = 0; i < 3; i++)
     	{
@@ -66,7 +66,7 @@ void TestBench()
     		float time_ms_ = (float) HAL_GetTick(); //uint32_t
     		pos_d[i] = amplitude[i] * sinf(2.0f*PI*freq[i] * time_ms_ / 1000.0f);
     	}
-
+        // Control computation
     	for (int i = 0; i < 3; i++)
     	{
 			pos_l[i] = pos[i];

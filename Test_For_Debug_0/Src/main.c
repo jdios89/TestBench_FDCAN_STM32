@@ -95,7 +95,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_FDCAN1_Init();
+//  MX_FDCAN1_Init();
   /* USER CODE BEGIN 2 */
 	/* Send dummy message*/
 	TxData[0] = 0x08;

@@ -12,10 +12,12 @@ FDCAN::hardware_resource_t *FDCAN::resFDCAN1 = 0;
 
 // Necessary to export for compiler to generate code to be called by the interrupt vector
 extern "C" __EXPORT void FDCAN1_IT0_IRQHandler(void);
+extern "C" __EXPORT void FDCAN1_IT1_IRQHandler(void);
 extern "C" __EXPORT void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs);
 extern "C" __EXPORT void HAL_FDCAN_RxBufferNewMessageCallback(FDCAN_HandleTypeDef *hfdcan);
 extern "C" __EXPORT void HAL_FDCAN_TxFifoEmptyCallback(FDCAN_HandleTypeDef *hfdcan);
 extern "C" __EXPORT void HAL_FDCAN_TxBufferCompleteCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t BufferIndexes);
+extern "C" __EXPORT void HAL_FDCAN_ErrorCallback(FDCAN_HandleTypeDef *hfdcan);
 
 /* Initalize shit  */
 uint8_t FDCAN::RX_test[8];
@@ -137,6 +139,9 @@ void FDCAN::InitPeripheral()
 			/* NVIC for FDCAN */
 			HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, 0, 0);
 			HAL_NVIC_EnableIRQ(FDCAN1_IT0_IRQn);
+			/* Try with line 1 too */
+			HAL_NVIC_SetPriority(FDCAN1_IT1_IRQn, 0, 0);
+		    HAL_NVIC_EnableIRQ(FDCAN1_IT1_IRQn);
 		}
 	}
 	_hRes->instances++;
@@ -148,6 +153,8 @@ void FDCAN::InitPeripheral()
 	TxHeader.BitRateSwitch = FDCAN_BRS_OFF;
 	TxHeader.FDFormat = FDCAN_CLASSIC_CAN;
 	TxHeader.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
+	TxHeader.TxEventFifoControl = FDCAN_STORE_TX_EVENTS;
+
 	TxHeader.MessageMarker = 0;
 }
 void FDCAN::ConfigurePeripheral()
@@ -282,16 +289,18 @@ void FDCAN::ConfigurePeripheral()
 			/* Start Error */
 			Error_Handler();
 		}
-		if (HAL_FDCAN_ActivateNotification(&_hRes->handle, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK)
+		/* ACTIVATE NOTIFICATION FOR NEW MESSAGE RECEIVED */
+		if (HAL_FDCAN_ActivateNotification(&_hRes->handle, FDCAN_IT_RX_FIFO0_NEW_MESSAGE | FDCAN_IT_TX_COMPLETE, 0) != HAL_OK)
 		{
 			/* Notification Error */
 			Error_Handler();
 		}
-//		if (HAL_FDCAN_ActivateNotification(&_hRes->handle, FDCAN_IT_TX_COMPLETE, 0) != HAL_OK)
-//		{
-//			/* Notification Error */
-//			Error_Handler();
-//		}
+		/* ACTIVATE NOTIFICATION FOR MESSAGE SENT */
+		if (HAL_FDCAN_ActivateNotification(&_hRes->handle, FDCAN_IT_TX_FIFO_EMPTY, 0) != HAL_OK)
+		{
+			/* Notification Error */
+			Error_Handler();
+		}
 	}
 	if (!_hRes)
 		return; /* only here works */
@@ -406,11 +415,11 @@ void FDCAN::Read(FDCAN_RxHeaderTypeDef *pRxHeader, uint8_t *pRxData)
 		Error_Handler();
 	}
 	//	if (HAL_FDCAN_ActivateNotification(&_hRes->handle, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK)
-	if (HAL_FDCAN_ActivateNotification(&_hRes->handle, FDCAN_IT_RX_BUFFER_NEW_MESSAGE, 0) != HAL_OK)
-	{
-		/* Notification Error */
-		Error_Handler();
-	}
+//	if (HAL_FDCAN_ActivateNotification(&_hRes->handle, FDCAN_IT_RX_BUFFER_NEW_MESSAGE, 0) != HAL_OK)
+//	{
+//		/* Notification Error */
+//		Error_Handler();
+//	}
 }
 void FDCAN::Read()
 {
@@ -440,7 +449,7 @@ void FDCAN::MessageCallback(FDCAN_HandleTypeDef *hfdcan)
 
 	FDCAN_RxHeaderTypeDef RxHeader;
 	uint8_t RxData[8];
-	if (HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_BUFFER0, &RxHeader, RxData) != HAL_OK)
+	if (HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
 	{
 		Error_Handler();
 	}
@@ -453,12 +462,19 @@ void FDCAN1_IT0_IRQHandler(void)
 		HAL_FDCAN_IRQHandler(&FDCAN::resFDCAN1->handle);
 }
 
+void FDCAN1_IT1_IRQHandler(void)
+{
+	if (FDCAN::resFDCAN1)
+		HAL_FDCAN_IRQHandler(&FDCAN::resFDCAN1->handle);
+}
+
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
 {
 	// clear the buffer I guess
+	FDCAN::MessageCallback(hfdcan);
 	FDCAN_RxHeaderTypeDef RxHeader;
 	uint8_t RxData[8];
-	uint32_t FifofillLevel = 0;
+	volatile uint32_t FifofillLevel = 0;
 
 	FifofillLevel = HAL_FDCAN_GetRxFifoFillLevel(hfdcan, FDCAN_RX_FIFO0);
 
@@ -514,8 +530,17 @@ void HAL_FDCAN_RxBufferNewMessageCallback(FDCAN_HandleTypeDef *hfdcan)
 	FDCAN::MessageCallback(hfdcan);
 }
 
-void HAL_FDCAN_TxFifoEmptyCallback(FDCAN_HandleTypeDef *hfdcan);
+void HAL_FDCAN_TxFifoEmptyCallback(FDCAN_HandleTypeDef *hfdcan){
+	volatile float happy = 0;
+}
 void HAL_FDCAN_TxBufferCompleteCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t BufferIndexes)
 {
+	volatile float sad = 0;
 	FDCAN::MessageCallback(hfdcan);
+}
+
+void HAL_FDCAN_ErrorCallback(FDCAN_HandleTypeDef *hfdcan)
+{
+  volatile float error = 0;
+
 }

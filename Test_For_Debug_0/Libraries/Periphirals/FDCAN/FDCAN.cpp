@@ -290,7 +290,7 @@ void FDCAN::ConfigurePeripheral()
 			Error_Handler();
 		}
 		/* ACTIVATE NOTIFICATION FOR NEW MESSAGE RECEIVED */
-		if (HAL_FDCAN_ActivateNotification(&_hRes->handle, FDCAN_IT_RX_FIFO0_NEW_MESSAGE | FDCAN_IT_TX_COMPLETE, 0) != HAL_OK)
+		if (HAL_FDCAN_ActivateNotification(&_hRes->handle, FDCAN_IT_RX_FIFO0_NEW_MESSAGE | FDCAN_IT_TX_COMPLETE | FDCAN_IT_TX_FIFO_EMPTY, 0) != HAL_OK)
 		{
 			/* Notification Error */
 			Error_Handler();
@@ -431,17 +431,14 @@ void FDCAN::Read()
 	}
 }
 
-uint32_t FDCAN::FiFoLatestTxRequest()
-{
+uint32_t FDCAN::FiFoLatestTxRequest() {
 	return HAL_FDCAN_GetLatestTxFifoQRequestBuffer(&_hRes->handle);
 }
 
-uint32_t FDCAN::isPending(uint32_t txbufferindex)
-{
+uint32_t FDCAN::isPending(uint32_t txbufferindex) {
 	// 0 no pending
 	// 1 pending
 	return HAL_FDCAN_IsTxBufferMessagePending(&_hRes->handle, txbufferindex);
-
 }
 
 void FDCAN::MessageCallback(FDCAN_HandleTypeDef *hfdcan)
@@ -449,12 +446,12 @@ void FDCAN::MessageCallback(FDCAN_HandleTypeDef *hfdcan)
 
 	FDCAN_RxHeaderTypeDef RxHeader;
 	uint8_t RxData[8];
-	if (HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
-	{
-		Error_Handler();
-	}
-	for (int i = 0; i < 8; i++)
-		RX_test[i] = RxData[i];
+//	if (HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
+//	{
+//		Error_Handler();
+//	}
+//	for (int i = 0; i < 8; i++)
+//		RX_test[i] = RxData[i];
 }
 void FDCAN1_IT0_IRQHandler(void)
 {
@@ -464,6 +461,7 @@ void FDCAN1_IT0_IRQHandler(void)
 
 void FDCAN1_IT1_IRQHandler(void)
 {
+	/* Not used this function */
 	if (FDCAN::resFDCAN1)
 		HAL_FDCAN_IRQHandler(&FDCAN::resFDCAN1->handle);
 }
@@ -496,8 +494,14 @@ void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)
 //		}
 //	}
 
-	if (HAL_FDCAN_ActivateNotification(hfdcan, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK)
-	{
+//	if (HAL_FDCAN_ActivateNotification(hfdcan, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK)
+//	{
+//		/* Notification Error */
+//		Error_Handler();
+//	}
+	if (HAL_FDCAN_ActivateNotification(hfdcan,
+			FDCAN_IT_RX_FIFO0_NEW_MESSAGE | FDCAN_IT_TX_COMPLETE
+					| FDCAN_IT_TX_FIFO_EMPTY, 0) != HAL_OK) {
 		/* Notification Error */
 		Error_Handler();
 	}
@@ -530,8 +534,13 @@ void HAL_FDCAN_RxBufferNewMessageCallback(FDCAN_HandleTypeDef *hfdcan)
 	FDCAN::MessageCallback(hfdcan);
 }
 
-void HAL_FDCAN_TxFifoEmptyCallback(FDCAN_HandleTypeDef *hfdcan){
-	volatile float happy = 0;
+void HAL_FDCAN_TxFifoEmptyCallback(FDCAN_HandleTypeDef *hfdcan) {
+	FDCAN::MessageCallback(hfdcan);
+	if (HAL_FDCAN_ActivateNotification(hfdcan,
+	FDCAN_IT_RX_FIFO0_NEW_MESSAGE | FDCAN_IT_TX_COMPLETE, 0) != HAL_OK) {
+		/* Notification Error */
+		Error_Handler();
+	}
 }
 void HAL_FDCAN_TxBufferCompleteCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t BufferIndexes)
 {

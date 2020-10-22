@@ -1,16 +1,26 @@
-/*
- * FDCAN.h
+/* Copyright (C) 2020-2020 Juan de Dios Flores Mendez. All rights reserved.
  *
- *  Created on: Jul 2, 2020
- *      Author: tequilajohn
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the MIT License
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the MIT License for further details.
+ *
+ * Contact information
+ * ------------------------------------------
+ * Juan de Dios Flores Mendez
+ * Web      :  https://github.com/jdios89
+ * e-mail   :  juan.dios.flores@gmail.com
+ * ------------------------------------------
  */
 
 #ifndef PERIPHIRALS_FDCAN_H
 #define PERIPHIRALS_FDCAN_H
 
-/* FDCAN port will be hard coded*/
 #include "stm32h7xx_hal.h"
-//#include "cmsis_os.h" // for memory allocation (for the buffer) and callback
+#include "cmsis_os.h" // for memory allocation (for the buffer) and callback
 
 class FDCAN
 {
@@ -49,12 +59,14 @@ public:
 	typedef struct hardware_resource_t
 	{
 		port_t port;
+		SemaphoreHandle_t resourceSemaphore;
+		SemaphoreHandle_t transmissionFinished;
 		bool configured;
 		uint8_t instances; // how many objects are using this hardware resource
 		FDCAN_HandleTypeDef handle;
 	} hardware_resource_t;
 
-	static hardware_resource_t *resFDCAN1;
+	static hardware_resource_t * resFDCAN1;
 
 private: //private
 	FDCAN_TxHeaderTypeDef TxHeader;

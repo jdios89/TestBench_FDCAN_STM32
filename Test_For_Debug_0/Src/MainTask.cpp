@@ -17,7 +17,9 @@
  */
 
 #include "MainTask.h"
+#include "stm32h7xx_hal.h"
 #include "cmsis_os.h"
+
 #include "FDCAN.h" // Periphirial library
 #include "Timer.h"
 //#include "PD4Cxx08.h"
@@ -85,18 +87,102 @@ void MainTask(void * pvParameters)
 //	UART * uart = new UART(UART::PORT_UART3, 460800, 500);
 //	MTI200 * mti200 = new MTI200(uart);
 	FDCAN * fdcantest = new FDCAN(); // port object
-	NANOTEC_CANOpen CANBustest(fdcantest); // port communication object
-	// NANOTEC(can_object, motor_id, max_current, current_constant Nm/A, Gear ratio, TicksperRev, MaxMotorSpeed)
-	NANOTEC NANOTEC_1(fdcantest,
-			(uint8_t) 0x1 , 2.0f, 3.54f/4.2f, 1.0f, 10000.0, 30.0); // platform specific constructor
-	NANOTEC_1.Configure();
+//	NANOTEC_CANOpen CANBustest(fdcantest); // port communication object
+// NANOTEC(can_object, motor_id, max_current, current_constant Nm/A, Gear ratio, TicksperRev, MaxMotorSpeed)
+//	NANOTEC NANOTEC_1(fdcantest,
+//			(uint8_t) 0x1 , 2.0f, 3.54f/4.2f, 1.0f, 10000.0, 30.0); // platform specific constructor
+//	NANOTEC_1.Configure();
 	NANOTEC * motor1 = new NANOTEC(fdcantest,(uint8_t) 0x1 , 2.0f, 3.54f/4.2f, 1.0f, 10000.0, 30.0);
 	NANOTEC * motor2 = new NANOTEC(fdcantest,(uint8_t) 0x2 , 2.0f, 3.54f/4.2f, 1.0f, 10000.0, 30.0);
 	NANOTEC * motor3 = new NANOTEC(fdcantest,(uint8_t) 0x3 , 2.0f, 3.54f/4.2f, 1.0f, 10000.0, 30.0);
 
+	/* For now configure the motors after creation */
+	motor1->Configure();
+	motor2->Configure();
+	motor3->Configure();
+
 	/* Initialize microseconds timer */
 	Timer * microsTimer = new Timer(Timer::TIMER6, 1000000); // create a 1 MHz counting timer used for micros() timing
 
+	/* Control variables */
+	TickType_t xLastWakeTime;
+	uint32_t prevTimerValue; // used for measuring dt
+	float timestamp, dt_compute, dt_compute2;
+	float SampleRate = 200;
+
+	/* Controller loop time / sample rate */
+	TickType_t loopWaitTicks = configTICK_RATE_HZ / SampleRate;
+	/* Main control loop */
+	xLastWakeTime = xTaskGetTickCount();
+	prevTimerValue = microsTimer->Get();
+	float pos[3] = {0.0f, 0.0f, 0.0f};
+	float pos_d[3] = {0.0f, 0.0f, 0.0f};
+	float pos_l[3] = {0.0f, 0.0f, 0.0f};
+	float error_pos[3] = {0.0f, 0.0f, 0.0f};
+	float error_pos_l[3] = {0.0f, 0.0f, 0.0f};
+	float output[3] = {0.0f, 0.0f, 0.0f};
+	float kp_c[3] = {0.0f, 0.0f, 0.0f};
+	float kd_c[3] = {0.0f, 0.0f, 0.0f};
+	float ki_c[3] = {0.0f, 0.0f, 0.0f};
+    float kp = 0.1;
+    float kd = 0.2;
+    float ki = 0.1;
+    float dt = 0.004;
+	// Compute control
+	while (true) {
+		osDelay(3);
+		/* Wait until time has been reached to make control loop periodic */
+//		vTaskDelayUntil(&xLastWakeTime, loopWaitTicks);
+		// Reference generator
+		float amplitude[3] = { 3.5, 1.0, 1.6 };
+		float freq[3] = { 0.23, 0.5, 1.0 };
+		for (int i = 0; i < 3; i++) {
+			float PI = 3.14159265;
+			float time_ms_ = (float) HAL_GetTick(); //uint32_t
+			pos_d[i] = amplitude[i]
+					* sinf(2.0f * PI * freq[i] * time_ms_ / 1000.0f);
+		}
+		// Control computation
+		for (int i = 0; i < 3; i++) {
+			pos_l[i] = pos[i];
+			switch (i) {
+			case 0:
+				pos[i] = motor1->GetAngle();
+				break;
+			case 1:
+				pos[i] = motor2->GetAngle();
+				break;
+			case 2:
+				pos[i] = motor3->GetAngle();
+				break;
+			}
+//			uint32_t timerPrev = HAL_tic();
+			float dt = microsTimer->GetDeltaTime(prevTimerValue);
+			prevTimerValue = microsTimer->Get();
+			timestamp = microsTimer->GetTime();
+//			pos[i] = NANOTECS[i].GetAngle();
+			error_pos_l[i] = error_pos[i];
+			error_pos[i] = pos_d[i] - pos[i];
+			kp_c[i] = kp * error_pos[i];
+			kd_c[i] = kd * (error_pos[i] - error_pos_l[i]);
+			ki_c[i] = 0;
+			output[i] = kp_c[i] + kd_c[i] + ki_c[i];
+//			NANOTECS[i].SetTorque(output[i]);
+			switch (i) {
+			case 0:
+				motor1->SetTorque(output[i]);
+				break;
+			case 1:
+				motor2->SetTorque(output[i]);
+				break;
+			case 2:
+				motor3->SetTorque(output[i]);
+				break;
+			}
+		}
+		//float time_ms = dt * 1000.0;
+		//HAL_Delay(int(time_ms));
+	}
 	//	NANOTEC * NANOTECS[3] =  {new NANOTEC(&fdcantest,(uint8_t) 0x1 , 2.0f, 3.54f/4.2f, 1.0f, 10000.0, 30.0),
 	//	    		              new NANOTEC(&fdcantest,(uint8_t) 0x2 , 2.0f, 3.54f/4.2f, 1.0f, 10000.0, 30.0),
 	//				              new NANOTEC(&fdcantest,(uint8_t) 0x3 , 2.0f, 3.54f/4.2f, 1.0f, 10000.0, 30.0)};

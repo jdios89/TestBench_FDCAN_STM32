@@ -32,6 +32,7 @@ Src/main.o: ../Src/main.c \
  /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim.h \
  /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h \
  /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Inc/stm32h7xx_nucleo_144.h \
+ /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Inc/stm32h7xx_hal_timebase_tim.h \
  /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h \
  /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Middlewares/Third_Party/FreeRTOS/Source/include/FreeRTOS.h \
  /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Inc/FreeRTOSConfig.h \
@@ -116,6 +117,8 @@ Src/main.o: ../Src/main.c \
 /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_tim_ex.h:
 
 /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Inc/stm32h7xx_nucleo_144.h:
+
+/home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Inc/stm32h7xx_hal_timebase_tim.h:
 
 /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h:
 

@@ -23,7 +23,7 @@
 #include "PD4Cxx08.h"
 #include "CAN_CMD.h"
 //#include "stm32h7xx_hal.h"
-
+void delay(uint32_t time_ms);
 class NANOTEC_CANOpen
 {
 public:

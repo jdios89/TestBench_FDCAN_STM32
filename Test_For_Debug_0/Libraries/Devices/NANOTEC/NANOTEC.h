@@ -81,6 +81,7 @@ public:
     float GetOutputAngleDeg();
     float GetOutputVelocity();
     float GetVelocity();
+    bool GetStatusWord(uint16_t * StatusWord);
     /* Getting things in PDO manner */
 	bool SetTorquePDO(float torqueNewtonMeter);
     bool SetOutputTorquePDO(float torqueNewtonMeter);

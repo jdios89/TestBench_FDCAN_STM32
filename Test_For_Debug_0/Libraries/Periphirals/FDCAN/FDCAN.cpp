@@ -466,9 +466,9 @@ void FDCAN::MessageCallback(FDCAN_HandleTypeDef *hfdcan) {
 
 	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 	/* Uncomment this line when using with RTOS kernel */
-//	xSemaphoreGiveFromISR(fdcan->transmissionFinished, &xHigherPriorityTaskWoken);
+	xSemaphoreGiveFromISR(fdcan->transmissionFinished, &xHigherPriorityTaskWoken);
 	/* Use this line when testing without the RTOS kernel */
-	xSemaphoreGive(fdcan->transmissionFinished);
+//	xSemaphoreGive(fdcan->transmissionFinished);
 	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 	/* Reactivate Interruptions, as in example */
 	if (HAL_FDCAN_ActivateNotification(hfdcan,

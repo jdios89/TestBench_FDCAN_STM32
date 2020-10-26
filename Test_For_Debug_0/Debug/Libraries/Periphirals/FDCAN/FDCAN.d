@@ -50,7 +50,8 @@ Libraries/Periphirals/FDCAN/FDCAN.o: \
  /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Middlewares/Third_Party/FreeRTOS/Source/include/event_groups.h \
  /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Middlewares/Third_Party/FreeRTOS/Source/include/timers.h \
  /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Inc/main.h \
- /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Inc/stm32h7xx_nucleo_144.h
+ /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Inc/stm32h7xx_nucleo_144.h \
+ /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Inc/stm32h7xx_hal_timebase_tim.h
 
 ../Libraries/Periphirals/FDCAN/FDCAN.h:
 
@@ -153,3 +154,5 @@ Libraries/Periphirals/FDCAN/FDCAN.o: \
 /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Inc/main.h:
 
 /home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Inc/stm32h7xx_nucleo_144.h:
+
+/home/tequilajohn/STM32CubeIDE/workspace_1.0.2/FDCAN_repository/Test_For_Debug_0/Inc/stm32h7xx_hal_timebase_tim.h:

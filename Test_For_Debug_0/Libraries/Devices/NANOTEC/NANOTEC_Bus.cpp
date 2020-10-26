@@ -17,7 +17,13 @@
 
 #include "NANOTEC_Bus.h"
 #include "FDCAN.h" //FDCAN Library
-//#include "stm32h7xx_hal.h"
+#include "stm32h7xx_hal.h"
+
+void delay(uint32_t time_ms) {
+	osDelay (time_ms*1000);
+//	HAL_Delay(time_ms*1000);
+}
+
 
 /* Auxiliary functions */
 uint8_t NANOTEC_CANOpen::lowByte(uint16_t byte16)
@@ -56,7 +62,7 @@ bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
     uint8_t d7 = 0x0; //MSB , little endian format
     _bus->WriteMessage(id, len, d0, d1, d2, d3, d4, d5, d6, d7);
     // Wait for a reply, set timeout of 2 ms
-    // HAL_Delay(1);
+    // HAL_delay(1);
     uint32_t timeout = 3;
     /* wait for reply */
     write_confirmed = waitReply(nodeid, register_index, subindex, timeout);
@@ -79,7 +85,7 @@ bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
     uint8_t d7 = 0x0; //MSB , little endian format
     _bus->WriteMessage(id, len, d0, d1, d2, d3, d4, d5, d6, d7);
     // Wait for a reply, set timeout of 2 ms
-    // HAL_Delay(1);
+    // HAL_delay(1);
     uint32_t timeout = 3;
     /* wait for reply */
     write_confirmed = waitReply(nodeid, register_index, subindex, timeout);
@@ -102,7 +108,7 @@ bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
     uint8_t d7 = 0x0; //MSB , little endian format
     _bus->WriteMessage(id, len, d0, d1, d2, d3, d4, d5, d6, d7);
     // Wait for a reply, set timeout of 2 ms
-    // HAL_Delay(1);
+    // HAL_delay(1);
     uint32_t timeout = 3;
     /* wait for reply */
     write_confirmed = waitReply(nodeid, register_index, subindex, timeout);
@@ -125,7 +131,7 @@ bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
     uint8_t d7 = 0x0; //MSB , little endian format
     _bus->WriteMessage(id, len, d0, d1, d2, d3, d4, d5, d6, d7);
     // Wait for a reply, set timeout of 2 ms
-    // HAL_Delay(1);
+    // HAL_delay(1);
     uint32_t timeout = 3;
     /* wait for reply */
     write_confirmed = waitReply(nodeid, register_index, subindex, timeout);
@@ -148,7 +154,7 @@ bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
     uint8_t d7 = (data >> 24) & 0xFF; //MSB , little endian format
     _bus->WriteMessage(id, len, d0, d1, d2, d3, d4, d5, d6, d7);
     // Wait for a reply, set timeout of 2 ms
-    // HAL_Delay(1);
+    // HAL_delay(1);
     uint32_t timeout = 3;
     /* wait for reply */
     write_confirmed = waitReply(nodeid, register_index, subindex, timeout);
@@ -171,7 +177,7 @@ bool NANOTEC_CANOpen::writeRegister(uint8_t nodeid, uint16_t register_index,
     uint8_t d7 = (data >> 24) & 0xFF; //MSB , little endian format
     _bus->WriteMessage(id, len, d0, d1, d2, d3, d4, d5, d6, d7);
     // Wait for a reply, set timeout of 2 ms
-    // HAL_Delay(1);
+    // HAL_delay(1);
     uint32_t timeout = 3;
     /* wait for reply */
     write_confirmed = waitReply(nodeid, register_index, subindex, timeout);
@@ -337,7 +343,7 @@ bool NANOTEC_CANOpen::waitReply(uint8_t nodeid, uint16_t register_index,
                 break;
             }
         }
-        HAL_Delay(1);
+        delay(1);
         chrono++;
     }
     return replied;
@@ -370,7 +376,7 @@ bool NANOTEC_CANOpen::waitReply(uint8_t nodeid, uint16_t register_index,
                 break;
             }
         }
-        HAL_Delay(1);
+        delay(1);
         chrono++;
     }
     return replied;
@@ -405,7 +411,7 @@ bool NANOTEC_CANOpen::waitReply(uint8_t nodeid, uint16_t register_index,
                 break;
             }
         }
-        HAL_Delay(1);
+        delay(1);
         chrono++;
     }
     return replied;
@@ -439,7 +445,7 @@ bool NANOTEC_CANOpen::waitReply(uint8_t nodeid, uint16_t register_index,
                 break;
             }
         }
-        HAL_Delay(1);
+        delay(1);
         chrono++;
     }
     return replied;
@@ -479,7 +485,7 @@ bool NANOTEC_CANOpen::waitReply(uint8_t nodeid, uint16_t register_index,
                 break;
             }
         }
-        HAL_Delay(1);
+        delay(1);
         chrono++;
     }
     return replied;
@@ -513,7 +519,7 @@ bool NANOTEC_CANOpen::waitReply(uint8_t nodeid, uint16_t register_index,
                 break;
             }
         }
-        HAL_Delay(1);
+        delay(1);
         chrono++;
     }
     return replied;
@@ -553,7 +559,7 @@ bool NANOTEC_CANOpen::waitReply(uint8_t nodeid, uint16_t register_index,
                 break;
             }
         }
-        HAL_Delay(1);
+        delay(1);
         chrono++;
     }
     return replied;
@@ -586,7 +592,7 @@ bool NANOTEC_CANOpen::waitForId(uint16_t id, bool setTimeout, uint32_t timeout)
     	}
 
     	if (setTimeout) chrono++; // increase only if the timeout is set
-    	HAL_Delay(1);
+    	delay(1);
     }
     return replied;
 }

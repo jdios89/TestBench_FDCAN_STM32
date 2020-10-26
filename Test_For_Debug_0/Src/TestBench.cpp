@@ -11,7 +11,6 @@
  *      Author: tequilajohn
  */
 
-
 #include "main.h"
 //#include "cmsis_os.h"
 
@@ -27,7 +26,7 @@ float pos_l[3] = {0.0, 0.0, 0.0}; // last position in radians
 float pos[3] = {0.0, 0.0, 0.0};
 float error_pos[3] = {0.0, 0.0, 0.0}; // error
 float error_pos_l[3] = {0.0, 0.0, 0.0}; // last error
-float dt = 0.005; // timestep 10 ms
+float dt = 0.005; // time-step 10 ms
 float kp = 0.18f/2.0f;
 float kd = 0.01;
 float ki = 0.001;
@@ -77,8 +76,13 @@ void TestBench()
 			kd_c[i] = 100 * kd * (error_pos[i] - error_pos_l[i]);
 			ki_c[i] = 0;
 			output[i] = kp_c[i] + kd_c[i] + ki_c[i];
-			NANOTECS[i].SetTorque(output[i]);
+//			NANOTECS[i].SetTorque(output[i]);
+//			NANOTECS[i].SetTorque(0.045)
+			uint16_t statusmotor = 0;
+			NANOTECS[i].GetStatusWord(&statusmotor);
+			volatile uint16_t readstatusdebug = statusmotor;
     	}
+    	for (int i = 0; i < 3; i++) NANOTECS[i].SetTorque(output[i]);
     	float time_ms = dt * 1000.0;
 		HAL_Delay(int(time_ms));
     }

@@ -19,11 +19,15 @@
 #include "stm32h7xx_hal.h"
 #include "NANOTEC_Bus.h"
 #include "FDCAN.h" //FDCAN Library
+#include "cmsis_os.h"
 
-void delay(uint32_t time_ms) {
+//	HAL_Delay(time_ms);
 
-	HAL_Delay(time_ms);
-}
+//void delay(uint32_t time_ms) {
+////	osDelay (time_ms);
+//	HAL_Delay(time_ms*100);
+//}
+
 
 NANOTEC::NANOTEC(FDCAN *bus, uint8_t nodeid, float MaxCurrent, float TorqueConstant, float GearRatio, uint32_t EncoderTicksPrRev, float MaxMotorSpeed, bool configPDOS) : NANOTEC_MAX_AMP_SETPOINT(MaxCurrent),
                                                                                                                                                                           MOTOR_TORQUE_CONSTANT(TorqueConstant),
@@ -131,9 +135,9 @@ void NANOTEC::Disable()
 bool NANOTEC::ResetNode()
 {
     _bus->_bus->WriteMessage(CAN_NMT, 2, CAN_RESET_NODE, _nodeid, 0, 0, 0, 0, 0, 0);
-    HAL_Delay(1);
+    delay(1);
     bool replied = _bus->waitForId(0x700 + _nodeid, true, 10000);
-    HAL_Delay(1000);
+    delay(1000);
     // this is a message object to hold incoming messages
     FDCAN_RxHeaderTypeDef RxHeader;
     uint8_t RxData[8];
@@ -198,16 +202,21 @@ bool NANOTEC::ActivateNode() {
 
 bool NANOTEC::ActivateStateMachine() {
 	Controlword_DataType control_status = 0x06;
+	uint16_t dummystatus = 0;
+	GetStatusWord(&dummystatus);
 	// _serialport->println("Ready to switch on");
 	_bus->writeRegister(_nodeid, Controlword, 0x0, control_status);
-	delay(50);
+	delay(100);
+	GetStatusWord(&dummystatus);
 	// _serialport->println("Switch on");
 	control_status = 0x07;
 	_bus->writeRegister(_nodeid, Controlword, 0x0, control_status);
-	delay(50);
+	delay(100);
+	GetStatusWord(&dummystatus);
 	// _serialport->println("Operation enable");
 	control_status = 0xF;
 	_bus->writeRegister(_nodeid, Controlword, 0x0, control_status);
+	GetStatusWord(&dummystatus);
 	return true;
 }
 
@@ -556,6 +565,10 @@ float GetVelocity()
     return 1.0f;
 }
 
+bool NANOTEC::GetStatusWord(uint16_t * StatusWord)
+{
+	return _bus->readRegister(_nodeid, Statusword, 0x0, StatusWord);
+}
 
 int32_t NANOTEC::GetEncoderRaw()
 {

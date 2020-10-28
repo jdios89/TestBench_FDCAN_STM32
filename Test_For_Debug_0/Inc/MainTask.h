@@ -24,6 +24,7 @@ extern "C" {
 #endif
 
 void MainTask(void * pvParameters);
+void testTask();
 
 #ifdef __cplusplus
 }

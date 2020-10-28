@@ -77,7 +77,7 @@ public:
 	hardware_resource_t *_hRes;
 
 private:
-	GPIO_TypeDef *_fdcanPort;
+//	GPIO_TypeDef * _fdcanPort;
 	bool _waitingForReply;
 };
 

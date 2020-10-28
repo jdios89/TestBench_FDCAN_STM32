@@ -19,7 +19,8 @@
 #include "MainTask.h"
 #include "stm32h7xx_hal.h"
 #include "cmsis_os.h"
-
+#include "main.h"
+//#include "MemoryManagement.h"
 #include "FDCAN.h" // Periphirial library
 #include "Timer.h"
 //#include "PD4Cxx08.h"
@@ -31,6 +32,10 @@ int32_t encoder1 = 0;
 int32_t encoder2 = 0;
 int32_t encoder3 = 0;
 
+void testTask()
+{
+	FDCAN * fdcantest22 = new FDCAN(); // port object
+}
 void MainTask(void * pvParameters)
 {
 //	/* Use this task to:
@@ -86,7 +91,26 @@ void MainTask(void * pvParameters)
 //	/* Prepare Xsens IMU always, since it is used for logging and comparison purposes */
 //	UART * uart = new UART(UART::PORT_UART3, 460800, 500);
 //	MTI200 * mti200 = new MTI200(uart);
+//	while (1) {
+//		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
+//		osDelay(500);
+//	}
+//	while (1) {
+//		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
+//		osDelay(500);
+//	}
+	float d = 2;
+	FDCAN fdcantest2; // port object
 	FDCAN * fdcantest = new FDCAN(); // port object
+	while (1) {
+		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
+		osDelay(500);
+	}
+
+
+//	FDCAN * fdcantest = new FDCAN(); // port object
+//	FDCAN fdcantest; // port object
+
 //	NANOTEC_CANOpen CANBustest(fdcantest); // port communication object
 // NANOTEC(can_object, motor_id, max_current, current_constant Nm/A, Gear ratio, TicksperRev, MaxMotorSpeed)
 //	NANOTEC NANOTEC_1(fdcantest,

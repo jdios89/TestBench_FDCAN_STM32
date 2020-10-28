@@ -24,6 +24,7 @@
 FDCAN::hardware_resource_t *FDCAN::resFDCAN1 = 0;
 
 // Necessary to export for compiler to generate code to be called by the interrupt vector
+
 extern "C" __EXPORT void FDCAN1_IT0_IRQHandler(void);
 extern "C" __EXPORT void FDCAN1_IT1_IRQHandler(void);
 extern "C" __EXPORT void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan,
@@ -39,10 +40,10 @@ extern "C" __EXPORT void HAL_FDCAN_ErrorCallback(FDCAN_HandleTypeDef *hfdcan);
 /* Initalize shit  */
 uint8_t FDCAN::RX_test[8];
 /* Initializing function */
-FDCAN::FDCAN(void) {
-	InitPeripheral();
-	ConfigurePeripheral();
-	_waitingForReply = false;
+FDCAN::FDCAN() : _waitingForReply(false), b(0), _hRes(0){
+//	InitPeripheral();
+//	ConfigurePeripheral();
+//	_waitingForReply = false;
 }
 
 FDCAN::~FDCAN() {

@@ -33,6 +33,7 @@
 "Middlewares/Third_Party/FreeRTOS/Source/portable/MemMang/heap_4.o"
 "Src/FreeRTOS-openocd.o"
 "Src/MainTask.o"
+"Src/MemoryManagement.o"
 "Src/TestBench.o"
 "Src/freertos.o"
 "Src/main.o"

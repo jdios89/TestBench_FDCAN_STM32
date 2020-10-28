@@ -5,6 +5,7 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
 ../Src/FreeRTOS-openocd.c \
+../Src/MemoryManagement.c \
 ../Src/freertos.c \
 ../Src/main.c \
 ../Src/stm32h7xx_hal_msp.c \
@@ -21,6 +22,7 @@ CPP_SRCS += \
 OBJS += \
 ./Src/FreeRTOS-openocd.o \
 ./Src/MainTask.o \
+./Src/MemoryManagement.o \
 ./Src/TestBench.o \
 ./Src/freertos.o \
 ./Src/main.o \
@@ -33,6 +35,7 @@ OBJS += \
 
 C_DEPS += \
 ./Src/FreeRTOS-openocd.d \
+./Src/MemoryManagement.d \
 ./Src/freertos.d \
 ./Src/main.d \
 ./Src/stm32h7xx_hal_msp.d \

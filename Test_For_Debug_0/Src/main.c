@@ -24,6 +24,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "MainTask.h"
+#include "MemoryManagement.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -100,6 +101,8 @@ int main(void)
 
   /* USER CODE BEGIN SysInit */
 	//	TestBench();
+  ZeroInitFreeRTOSheap();
+
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -122,17 +125,15 @@ int main(void)
 //	MainTask(1);
 	for (int i = 0; i < 5; i++) {
 		LED_Display(0);
-		HAL_Delay(5000);
+		HAL_Delay(2000);
 		LED_Display(1);
-		HAL_Delay(5000);
+		HAL_Delay(2000);
 		LED_Display(2);
-		HAL_Delay(5000);
-		LED_Display(0);
-		HAL_Delay(5000);
-		LED_Display(1);
+		HAL_Delay(2000);
 	}
+	BSP_LED_Off(2);
 //	MainTask(1);
-
+	testTask();
 	/* If do it with RTOS then */
 	if (1) {
 		// ZeroInitFreeRTOSheap();

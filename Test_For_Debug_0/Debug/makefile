@@ -56,7 +56,7 @@ all: Test_For_Debug_0.elf
 Test_For_Debug_0.elf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MCU G++ Linker'
-	arm-none-eabi-g++ -mcpu=cortex-m7 -mthumb -mfloat-abi=hard -mfpu=fpv5-d16 -specs=nosys.specs -specs=nano.specs -Xlinker -Xlinker --wrap=_free_r -Xlinker -Xlinker --wrap=free -Xlinker -Xlinker --wrap=malloc -Xlinker -Xlinker --wrap=_malloc_r -T"../STM32H743ZITx_FLASH.ld" -Wl,-Map=output.map -Wl,--gc-sections -fno-exceptions -fno-rtti -o "Test_For_Debug_0.elf" @"objects.list" $(USER_OBJS) $(LIBS) -lm
+	arm-none-eabi-g++ -mcpu=cortex-m7 -mthumb -mfloat-abi=hard -mfpu=fpv5-d16 -specs=nosys.specs -specs=nano.specs -Xlinker --wrap=malloc -Xlinker --wrap=_malloc_r -Xlinker --wrap=free -Xlinker --wrap=_free_r -T"../STM32H743ZITx_FLASH.ld" -Wl,-Map=output.map -Wl,--gc-sections -fno-exceptions -fno-rtti -o "Test_For_Debug_0.elf" @"objects.list" $(USER_OBJS) $(LIBS) -lm
 	@echo 'Finished building target: $@'
 	@echo ' '
 	$(MAKE) --no-print-directory post-build

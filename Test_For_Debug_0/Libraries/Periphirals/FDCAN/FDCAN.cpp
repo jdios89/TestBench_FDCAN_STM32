@@ -40,10 +40,11 @@ extern "C" __EXPORT void HAL_FDCAN_ErrorCallback(FDCAN_HandleTypeDef *hfdcan);
 /* Initalize shit  */
 uint8_t FDCAN::RX_test[8];
 /* Initializing function */
-FDCAN::FDCAN() : _waitingForReply(false), b(0), _hRes(0){
-//	InitPeripheral();
-//	ConfigurePeripheral();
-//	_waitingForReply = false;
+FDCAN::FDCAN() :
+		_waitingForReply(false), b(0), _hRes(0) {
+	InitPeripheral();
+	ConfigurePeripheral();
+	_waitingForReply = false;
 }
 
 FDCAN::~FDCAN() {
@@ -144,14 +145,16 @@ void FDCAN::InitPeripheral() {
 			HAL_GPIO_Init(FDCAN1_RX_GPIO_Port, &GPIO_InitStruct);
 
 			/* Peripheral clock enable*/
-			__HAL_RCC_FDCAN_CLK_ENABLE()
-			;
+			__HAL_RCC_FDCAN_CLK_ENABLE();
 
 			/* NVIC for FDCAN */
-			HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, 0, 0);
+//			HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, 4, 0);
+			HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, 5,0);
 			HAL_NVIC_EnableIRQ(FDCAN1_IT0_IRQn);
 			/* Try with line 1 too */
-			HAL_NVIC_SetPriority(FDCAN1_IT1_IRQn, 0, 0);
+//			HAL_NVIC_SetPriority(FDCAN1_IT1_IRQn, 4, 0);
+			HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, 5,0);
+
 			HAL_NVIC_EnableIRQ(FDCAN1_IT1_IRQn);
 		}
 	}
@@ -457,34 +460,25 @@ uint32_t FDCAN::isPending(uint32_t txbufferindex) {
 }
 
 void FDCAN::MessageCallback(FDCAN_HandleTypeDef *hfdcan) {
-
 	// Tx Transfer completed
 	FDCAN::hardware_resource_t * fdcan;
 	if (hfdcan->Instance == FDCAN1)
 		fdcan = FDCAN::resFDCAN1;
 	else
 		return;
-
 	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 	/* Uncomment this line when using with RTOS kernel */
 	xSemaphoreGiveFromISR(fdcan->transmissionFinished, &xHigherPriorityTaskWoken);
 	/* Use this line when testing without the RTOS kernel */
-//	xSemaphoreGive(fdcan->transmissionFinished);
+	xSemaphoreGive(fdcan->transmissionFinished);
 	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 	/* Reactivate Interruptions, as in example */
 	if (HAL_FDCAN_ActivateNotification(hfdcan,
-			FDCAN_IT_RX_FIFO0_NEW_MESSAGE | FDCAN_IT_TX_COMPLETE
-					| FDCAN_IT_TX_FIFO_EMPTY, 0) != HAL_OK) {
+	FDCAN_IT_RX_FIFO0_NEW_MESSAGE | FDCAN_IT_TX_COMPLETE | FDCAN_IT_TX_FIFO_EMPTY,
+			0) != HAL_OK) {
 		/* Notification Error */
 		Error_Handler();
 	}
-	//	}
-//	if (HAL_FDCAN_GetRxMessage(hfdcan, FDCAN_RX_FIFO0, &RxHeader, RxData) != HAL_OK)
-//	{
-//		Error_Handler();
-//	}
-//	for (int i = 0; i < 8; i++)
-//		RX_test[i] = RxData[i];
 }
 void FDCAN1_IT0_IRQHandler(void) {
 	if (FDCAN::resFDCAN1)
@@ -500,21 +494,74 @@ void FDCAN1_IT1_IRQHandler(void) {
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan,
 		uint32_t RxFifo0ITs) {
 	// clear the buffer I guess
-	FDCAN::MessageCallback(hfdcan);
+//	FDCAN::MessageCallback(hfdcan);
+	FDCAN::hardware_resource_t * fdcan;
+	if (hfdcan->Instance == FDCAN1)
+		fdcan = FDCAN::resFDCAN1;
+	else
+		return;
+	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+	/* Uncomment this line when using with RTOS kernel */
+	xSemaphoreGiveFromISR(fdcan->transmissionFinished, &xHigherPriorityTaskWoken);
+	/* Use this line when testing without the RTOS kernel */
+//	xSemaphoreGive(fdcan->transmissionFinished);
+	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 void HAL_FDCAN_RxBufferNewMessageCallback(FDCAN_HandleTypeDef *hfdcan) {
-	FDCAN::MessageCallback(hfdcan);
+	//	FDCAN::MessageCallback(hfdcan);
+	FDCAN::hardware_resource_t * fdcan;
+	if (hfdcan->Instance == FDCAN1)
+		fdcan = FDCAN::resFDCAN1;
+	else
+		return;
+	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+	/* Uncomment this line when using with RTOS kernel */
+	xSemaphoreGiveFromISR(fdcan->transmissionFinished, &xHigherPriorityTaskWoken);
+	/* Use this line when testing without the RTOS kernel */
+//	xSemaphoreGive(fdcan->transmissionFinished);
+	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 void HAL_FDCAN_TxFifoEmptyCallback(FDCAN_HandleTypeDef *hfdcan) {
-	FDCAN::MessageCallback(hfdcan);
+	//	FDCAN::MessageCallback(hfdcan);
+	FDCAN::hardware_resource_t * fdcan;
+	if (hfdcan->Instance == FDCAN1)
+		fdcan = FDCAN::resFDCAN1;
+	else
+		return;
+	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+	/* Uncomment this line when using with RTOS kernel */
+	xSemaphoreGiveFromISR(fdcan->transmissionFinished, &xHigherPriorityTaskWoken);
+	/* Use this line when testing without the RTOS kernel */
+//	xSemaphoreGive(fdcan->transmissionFinished);
+	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
-void HAL_FDCAN_TxBufferCompleteCallback(FDCAN_HandleTypeDef *hfdcan,
-		uint32_t BufferIndexes) {
-	volatile float sad = 0;
-	FDCAN::MessageCallback(hfdcan);
+void HAL_FDCAN_TxBufferCompleteCallback(FDCAN_HandleTypeDef *hfdcan) {
+//	FDCAN::MessageCallback(hfdcan);
+	FDCAN::hardware_resource_t * fdcan;
+	if (hfdcan->Instance == FDCAN1)
+		fdcan = FDCAN::resFDCAN1;
+	else
+		return;
+	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+	/* Uncomment this line when using with RTOS kernel */
+	xSemaphoreGiveFromISR(fdcan->transmissionFinished, &xHigherPriorityTaskWoken);
+	/* Use this line when testing without the RTOS kernel */
+//	xSemaphoreGive(fdcan->transmissionFinished);
+	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
 
 void HAL_FDCAN_ErrorCallback(FDCAN_HandleTypeDef *hfdcan) {
-	volatile float error = 0;
+//	FDCAN::MessageCallback(hfdcan);
+	FDCAN::hardware_resource_t * fdcan;
+	if (hfdcan->Instance == FDCAN1)
+		fdcan = FDCAN::resFDCAN1;
+	else
+		return;
+	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+	/* Uncomment this line when using with RTOS kernel */
+	xSemaphoreGiveFromISR(fdcan->transmissionFinished, &xHigherPriorityTaskWoken);
+	/* Use this line when testing without the RTOS kernel */
+//	xSemaphoreGive(fdcan->transmissionFinished);
+	portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }

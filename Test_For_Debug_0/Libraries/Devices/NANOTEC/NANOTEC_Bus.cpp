@@ -20,7 +20,7 @@
 #include "stm32h7xx_hal.h"
 
 void delay(uint32_t time_ms) {
-	osDelay (time_ms*1000);
+	osDelay (time_ms);
 //	HAL_Delay(time_ms*1000);
 }
 

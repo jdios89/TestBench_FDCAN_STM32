@@ -97,10 +97,10 @@
 								<option id="gnu.cpp.link.option.paths.769974006" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" useByScannerDiscovery="false"/>
 								<option id="gnu.cpp.link.option.flags.1528835108" name="Linker flags" superClass="gnu.cpp.link.option.flags" useByScannerDiscovery="false" value="-specs=nosys.specs -specs=nano.specs" valueType="string"/>
 								<option id="gnu.cpp.link.option.other.57887764" name="Other options (-Xlinker [option])" superClass="gnu.cpp.link.option.other" useByScannerDiscovery="false" valueType="stringList">
-									<listOptionValue builtIn="false" value="-Xlinker --wrap=_free_r"/>
-									<listOptionValue builtIn="false" value="-Xlinker --wrap=free"/>
-									<listOptionValue builtIn="false" value="-Xlinker --wrap=malloc"/>
-									<listOptionValue builtIn="false" value="-Xlinker --wrap=_malloc_r"/>
+									<listOptionValue builtIn="false" value="--wrap=malloc"/>
+									<listOptionValue builtIn="false" value="--wrap=_malloc_r"/>
+									<listOptionValue builtIn="false" value="--wrap=free"/>
+									<listOptionValue builtIn="false" value="--wrap=_free_r"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.579736392" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

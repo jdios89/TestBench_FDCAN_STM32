@@ -34,7 +34,8 @@ int32_t encoder3 = 0;
 
 void testTask()
 {
-	FDCAN * fdcantest22 = new FDCAN(); // port object
+	float desd = 0.0f;
+//	FDCAN * fdcantest22 = new FDCAN(); // port object
 }
 void MainTask(void * pvParameters)
 {
@@ -100,8 +101,19 @@ void MainTask(void * pvParameters)
 //		osDelay(500);
 //	}
 	float d = 2;
-	FDCAN fdcantest2; // port object
+//	FDCAN fdcantest2; // port object
 	FDCAN * fdcantest = new FDCAN(); // port object
+
+	NANOTEC * motor1 = new NANOTEC(fdcantest, (uint8_t) 0x1, 2.0f, 3.54f / 4.2f,
+			1.0f, 10000.0, 30.0);
+	NANOTEC * motor2 = new NANOTEC(fdcantest, (uint8_t) 0x2, 2.0f, 3.54f / 4.2f,
+			1.0f, 10000.0, 30.0);
+	NANOTEC * motor3 = new NANOTEC(fdcantest, (uint8_t) 0x3, 2.0f, 3.54f / 4.2f,
+			1.0f, 10000.0, 30.0);
+	fdcantest->WriteDummyData((uint8_t) 8);
+	/* For now configure the motors after creation */
+//	motor1->Configure();
+
 	while (1) {
 		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
 		osDelay(500);
@@ -116,9 +128,9 @@ void MainTask(void * pvParameters)
 //	NANOTEC NANOTEC_1(fdcantest,
 //			(uint8_t) 0x1 , 2.0f, 3.54f/4.2f, 1.0f, 10000.0, 30.0); // platform specific constructor
 //	NANOTEC_1.Configure();
-	NANOTEC * motor1 = new NANOTEC(fdcantest,(uint8_t) 0x1 , 2.0f, 3.54f/4.2f, 1.0f, 10000.0, 30.0);
-	NANOTEC * motor2 = new NANOTEC(fdcantest,(uint8_t) 0x2 , 2.0f, 3.54f/4.2f, 1.0f, 10000.0, 30.0);
-	NANOTEC * motor3 = new NANOTEC(fdcantest,(uint8_t) 0x3 , 2.0f, 3.54f/4.2f, 1.0f, 10000.0, 30.0);
+//	NANOTEC * motor1 = new NANOTEC(fdcantest,(uint8_t) 0x1 , 2.0f, 3.54f/4.2f, 1.0f, 10000.0, 30.0);
+//	NANOTEC * motor2 = new NANOTEC(fdcantest,(uint8_t) 0x2 , 2.0f, 3.54f/4.2f, 1.0f, 10000.0, 30.0);
+//	NANOTEC * motor3 = new NANOTEC(fdcantest,(uint8_t) 0x3 , 2.0f, 3.54f/4.2f, 1.0f, 10000.0, 30.0);
 
 	/* For now configure the motors after creation */
 	motor1->Configure();

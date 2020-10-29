@@ -152,35 +152,35 @@ bool NANOTEC::Configure()
 {
 	// Reset the node
 	ResetNode();
-	// Turn to preoperational to turn off all the PDOS
-	PreoperationalNode();
-	// Deactivate PDOs in an appropiate manner
-	volatile bool deactivated_pdos = DeactivatePDOs();
-
-	if (_configPDOS)
-		_configuredPDOS = ConfigurePDOS();
-	/* A fault can be triggered if the voltage in the motor comes
-	   after the voltage in the controller */
-	// Reset Fault
-	ResetFault();
-	// Exit Fault
-	ExitFault();
-	// Save initial encoder settings just in case
-	GetEncoderUnitsBoot();
-	// Set Encoder Settings according to configuration
-	SetEncoderUnits();
-	// Get boot encoder
-	GetEncoderBootRaw();
-	// Set Torque Settings
-	SetTorqueSettings();
-	// Activate the Node
-	ActivateNode();
-	// Turn on the motor
-	ActivateStateMachine();
-	_configured = true;
-	if (_configPDOS && _configuredPDOS)
-		// SendSyncMessage();
-    return true;
+//	// Turn to preoperational to turn off all the PDOS
+//	PreoperationalNode();
+//	// Deactivate PDOs in an appropiate manner
+//	volatile bool deactivated_pdos = DeactivatePDOs();
+//
+//	if (_configPDOS)
+//		_configuredPDOS = ConfigurePDOS();
+//	/* A fault can be triggered if the voltage in the motor comes
+//	   after the voltage in the controller */
+//	// Reset Fault
+//	ResetFault();
+//	// Exit Fault
+//	ExitFault();
+//	// Save initial encoder settings just in case
+//	GetEncoderUnitsBoot();
+//	// Set Encoder Settings according to configuration
+//	SetEncoderUnits();
+//	// Get boot encoder
+//	GetEncoderBootRaw();
+//	// Set Torque Settings
+//	SetTorqueSettings();
+//	// Activate the Node
+//	ActivateNode();
+//	// Turn on the motor
+//	ActivateStateMachine();
+//	_configured = true;
+//	if (_configPDOS && _configuredPDOS)
+//		// SendSyncMessage();
+//    return true;
 }
 
 bool NANOTEC::ActivateNode() {

@@ -110,13 +110,13 @@ void MainTask(void * pvParameters)
 			1.0f, 10000.0, 30.0);
 	NANOTEC * motor3 = new NANOTEC(fdcantest, (uint8_t) 0x3, 2.0f, 3.54f / 4.2f,
 			1.0f, 10000.0, 30.0);
-	fdcantest->WriteDummyData((uint8_t) 8);
+	fdcantest->WriteDummyData((uint8_t) 2);
 	/* For now configure the motors after creation */
 //	motor1->Configure();
 
 	while (1) {
 		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
-		osDelay(500);
+		osDelay(348);
 	}
 
 

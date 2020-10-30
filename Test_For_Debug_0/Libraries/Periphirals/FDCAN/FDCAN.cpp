@@ -54,7 +54,6 @@ FDCAN::~FDCAN() {
 	_hRes->instances--;
 	if (_hRes->instances == 0) { // deinitialize port and peripherals
 		DeInitiPeripheral();
-
 		// Delete hardware resource
 		port_t tmpPort = _hRes->port;
 		//		delete _hRes; TK shit
@@ -83,7 +82,6 @@ void FDCAN::DeInitiPeripheral() {
 		 */
 		HAL_GPIO_DeInit(FDCAN1_TX_GPIO_Port, FDCAN1_RX_Pin | FDCAN1_TX_Pin);
 		/* Deactivate interruptions*/
-
 		HAL_NVIC_DisableIRQ(FDCAN1_IT0_IRQn);
 	}
 }
@@ -148,13 +146,10 @@ void FDCAN::InitPeripheral() {
 			__HAL_RCC_FDCAN_CLK_ENABLE();
 
 			/* NVIC for FDCAN */
-//			HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, 4, 0);
 			HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, 5,0);
 			HAL_NVIC_EnableIRQ(FDCAN1_IT0_IRQn);
 			/* Try with line 1 too */
-//			HAL_NVIC_SetPriority(FDCAN1_IT1_IRQn, 4, 0);
 			HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, 5,0);
-
 			HAL_NVIC_EnableIRQ(FDCAN1_IT1_IRQn);
 		}
 	}
@@ -168,7 +163,6 @@ void FDCAN::InitPeripheral() {
 	TxHeader.FDFormat = FDCAN_CLASSIC_CAN;
 	TxHeader.TxEventFifoControl = FDCAN_NO_TX_EVENTS;
 	TxHeader.TxEventFifoControl = FDCAN_STORE_TX_EVENTS;
-
 	TxHeader.MessageMarker = 0;
 }
 void FDCAN::ConfigurePeripheral() {

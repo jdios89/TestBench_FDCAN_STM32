@@ -117,8 +117,7 @@ void FDCAN::InitPeripheral() {
 		}
 		vQueueAddToRegistry(_hRes->transmissionFinished, "FDCAN Finish");
 		xSemaphoreGive(_hRes->transmissionFinished); // ensure that the semaphore is not taken from the beginning
-		xSemaphoreTake(_hRes->transmissionFinished,
-				( TickType_t ) portMAX_DELAY); // ensure that the semaphore is not taken from the beginning
+		xSemaphoreTake(_hRes->transmissionFinished, ( TickType_t ) portMAX_DELAY); // ensure that the semaphore is not taken from the beginning
 
 		// COnfigure pins for I2C accordingly
 		if (port == PORT_FDCAN1) {
@@ -143,13 +142,14 @@ void FDCAN::InitPeripheral() {
 			HAL_GPIO_Init(FDCAN1_RX_GPIO_Port, &GPIO_InitStruct);
 
 			/* Peripheral clock enable*/
-			__HAL_RCC_FDCAN_CLK_ENABLE();
+			__HAL_RCC_FDCAN_CLK_ENABLE()
+			;
 
 			/* NVIC for FDCAN */
-			HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, 5,0);
+			HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, 5, 0);
 			HAL_NVIC_EnableIRQ(FDCAN1_IT0_IRQn);
 			/* Try with line 1 too */
-			HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, 5,0);
+			HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, 5, 0);
 			HAL_NVIC_EnableIRQ(FDCAN1_IT1_IRQn);
 		}
 	}
@@ -305,6 +305,7 @@ void FDCAN::ConfigurePeripheral() {
 	if (!_hRes)
 		return; /* only here works */
 }
+
 uint32_t FDCAN::GetRxFiFoLevel() {
 	uint32_t FifofillLevel = 0;
 	FifofillLevel = HAL_FDCAN_GetRxFifoFillLevel(&_hRes->handle,
@@ -317,8 +318,7 @@ void FDCAN::WriteDummyData(uint8_t data) {
 		return;
 	xSemaphoreTake(_hRes->resourceSemaphore, ( TickType_t ) portMAX_DELAY); // take hardware resource
 	if (uxSemaphoreGetCount(_hRes->transmissionFinished)) // semaphore is available to be taken - which it should not be at this state before starting the transmission, since we use the semaphore for flagging the finish transmission event
-		xSemaphoreTake(_hRes->transmissionFinished,
-				( TickType_t ) portMAX_DELAY); // something incorrect happened, as the transmissionFinished semaphore should always be taken before a transmission starts
+		xSemaphoreTake(_hRes->transmissionFinished, ( TickType_t ) portMAX_DELAY); // something incorrect happened, as the transmissionFinished semaphore should always be taken before a transmission starts
 	TxHeader.Identifier = 0x111;
 	TxHeader.DataLength = FDCAN_DLC_BYTES_6;
 	TxHeader.DataLength = FDCAN_DLC_BYTES_5;
@@ -348,6 +348,12 @@ void FDCAN::WriteDummyData(uint8_t data) {
 void FDCAN::WriteMessage(uint32_t id, uint8_t len, uint8_t d0, uint8_t d1,
 		uint8_t d2, uint8_t d3, uint8_t d4, uint8_t d5, uint8_t d6,
 		uint8_t d7) {
+	if (!_hRes)
+		return;
+	xSemaphoreTake(_hRes->resourceSemaphore, ( TickType_t ) portMAX_DELAY); // take hardware resource
+	if (uxSemaphoreGetCount(_hRes->transmissionFinished)) // semaphore is available to be taken - which it should not be at this state before starting the transmission, since we use the semaphore for flagging the finish transmission event
+		xSemaphoreTake(_hRes->transmissionFinished, ( TickType_t ) portMAX_DELAY); // something incorrect happened, as the transmissionFinished semaphore should always be taken before a transmission starts
+
 	TxHeader.Identifier = id;
 	/* The length is cap by CAN Classic frame up to 8 bytes*/
 	switch (len) {
@@ -391,12 +397,27 @@ void FDCAN::WriteMessage(uint32_t id, uint8_t len, uint8_t d0, uint8_t d1,
 	TxData[7] = d7;
 	// Send message if the fifo is ready
 //	while(isPending(FiFoLatestTxRequest())){}
+
+	/* Deprecated to use the real time os
 	if (HAL_FDCAN_AddMessageToTxFifoQ(&_hRes->handle, &TxHeader, TxData)
 			!= HAL_OK) {
 		TxData[1] = 0x2;
-		/*Transmission request Error*/
+		/*Transmission request Error
 		Error_Handler();
 	}
+	*/
+
+	/* Real time os things */
+	if (HAL_FDCAN_AddMessageToTxFifoQ(&_hRes->handle, &TxHeader, TxData)
+			== HAL_OK) {
+		// Wait for the transmission to finish
+		xSemaphoreTake(_hRes->transmissionFinished, ( TickType_t ) portMAX_DELAY);
+	} else {
+		volatile float debug_var = 0.0f;
+		// ERROR("Failed FDCAN transmission");
+	}
+	xSemaphoreGive(_hRes->resourceSemaphore); // give hardware resource back
+
 //	while(isPending(FiFoLatestTxRequest())){ HAL_Delay(1);}
 //	HAL_Delay(1);
 	//	if(HAL_FDCAN_AddMessageToTxFifoQ(&_hRes->handle, &TxHeader, TxData) != HAL_OK)
@@ -422,25 +443,59 @@ void FDCAN::WriteMessage(uint32_t id, uint8_t len, uint8_t d0, uint8_t d1,
 }
 
 void FDCAN::Read(FDCAN_RxHeaderTypeDef *pRxHeader, uint8_t *pRxData) {
-	//	int a;
+	if (!_hRes)
+		return;
+	xSemaphoreTake(_hRes->resourceSemaphore, ( TickType_t ) portMAX_DELAY); // take hardware resource
+	if (uxSemaphoreGetCount(_hRes->transmissionFinished)) // semaphore is available to be taken - which it should not be at this state before starting the transmission, since we use the semaphore for flagging the finish transmission event
+		xSemaphoreTake(_hRes->transmissionFinished, ( TickType_t ) portMAX_DELAY); // something incorrect happened, as the transmissionFinished semaphore should always be taken before a transmission starts
+
+/*
 	if (HAL_FDCAN_GetRxMessage(&_hRes->handle, FDCAN_RX_FIFO0, pRxHeader,
 			pRxData) != HAL_OK) {
 		Error_Handler();
 	}
-	//	if (HAL_FDCAN_ActivateNotification(&_hRes->handle, FDCAN_IT_RX_FIFO0_NEW_MESSAGE, 0) != HAL_OK)
-//	if (HAL_FDCAN_ActivateNotification(&_hRes->handle, FDCAN_IT_RX_BUFFER_NEW_MESSAGE, 0) != HAL_OK)
-//	{
-//		/* Notification Error */
-//		Error_Handler();
-//	}
+*/
+
+	/* Real time os things */
+	if (HAL_FDCAN_GetRxMessage(&_hRes->handle, FDCAN_RX_FIFO0, pRxHeader, pRxData)
+			== HAL_OK) {
+		// Wait for the transmission to finish
+		/* Not needed
+		xSemaphoreTake(_hRes->transmissionFinished, ( TickType_t ) portMAX_DELAY);
+	  */
+	} else {
+		volatile float debug_var = 0.0f;
+		// ERROR("Failed FDCAN transmission");
+	}
+	xSemaphoreGive(_hRes->resourceSemaphore); // give hardware resource back
 }
+
 void FDCAN::Read() {
 	FDCAN_RxHeaderTypeDef RxHeader;
 	uint8_t RxData[8];
+	if (!_hRes)
+		return;
+	xSemaphoreTake(_hRes->resourceSemaphore, ( TickType_t ) portMAX_DELAY); // take hardware resource
+	if (uxSemaphoreGetCount(_hRes->transmissionFinished)) // semaphore is available to be taken - which it should not be at this state before starting the transmission, since we use the semaphore for flagging the finish transmission event
+		xSemaphoreTake(_hRes->transmissionFinished, ( TickType_t ) portMAX_DELAY); // something incorrect happened, as the transmissionFinished semaphore should always be taken before a transmission starts
+	/*
 	if (HAL_FDCAN_GetRxMessage(&_hRes->handle, FDCAN_RX_FIFO0, &RxHeader,
 			RxData) != HAL_OK) {
 		Error_Handler();
 	}
+	*/
+	/* Real time os things */
+	if (HAL_FDCAN_GetRxMessage(&_hRes->handle, FDCAN_RX_FIFO0, &RxHeader, RxData)
+			== HAL_OK) {
+		// Wait for the transmission to finish
+		/* Not needed
+		xSemaphoreTake(_hRes->transmissionFinished, ( TickType_t ) portMAX_DELAY);
+	  */
+	} else {
+		volatile float debug_var = 0.0f;
+		// ERROR("Failed FDCAN transmission");
+	}
+	xSemaphoreGive(_hRes->resourceSemaphore); // give hardware resource back
 }
 
 uint32_t FDCAN::FiFoLatestTxRequest() {

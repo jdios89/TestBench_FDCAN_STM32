@@ -78,7 +78,7 @@ void MainTask(void * pvParameters) {
 	TickType_t xLastWakeTime;
 	uint32_t prevTimerValue; // used for measuring dt
 	float timestamp, dt_compute, dt_compute2;
-	float SampleRate = 75;
+	float SampleRate = 120; // can improve
 
 	/* Controller loop time / sample rate */
 	TickType_t loopWaitTicks = configTICK_RATE_HZ / SampleRate;
@@ -96,7 +96,7 @@ void MainTask(void * pvParameters) {
 	float ki_c[3] = { 0.0f, 0.0f, 0.0f };
 	float kp = 0.08;
 	float kd = 0.0; // 0.2;
-	float ki = 0.1;
+	float ki = 0.0;
 //	float dt = 0.004;
 
 	/*
@@ -109,6 +109,10 @@ void MainTask(void * pvParameters) {
 	while (1) {
 		/* Wait until time has been reached to make control loop periodic */
 		vTaskDelayUntil(&xLastWakeTime, loopWaitTicks);
+		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
+
+///		osDelay(1);
+///		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
 //		osDelay(3);
 		// Reference generator
 		float amplitude[3] = { 3.5, 1.0, 1.6 };
@@ -118,23 +122,33 @@ void MainTask(void * pvParameters) {
 			float time_ms_ = (float) HAL_GetTick(); //uint32_t
 			pos_d[i] = amplitude[i] * sinf(2.0f * PI * freq[i] * time_ms_ / 1000.0f);
 		}
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 3; i++){
 			pos_d[i] = 0.0;
+		}
 		// Control computation
 		for (int i = 0; i < 3; i++) {
 			pos_l[i] = pos[i];
 			switch (i) {
 			case 0:
+		//		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
 				pos[i] = motor1->GetAngle();
+			//	HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
 				break;
 			case 1:
+			//	HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
 				pos[i] = motor2->GetAngle();
+		//		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
 				break;
 			case 2:
+		//		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
 				pos[i] = motor3->GetAngle();
+		//		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
 				break;
 			}
+
 //			uint32_t timerPrev = HAL_tic();
+			volatile float posv[3] = {0.0, 0.0, 0.0};
+			for (int i = 0; i < 3; i++) posv[i] = pos[i];
 			float dt = microsTimer->GetDeltaTime(prevTimerValue);
 			prevTimerValue = microsTimer->Get();
 			timestamp = microsTimer->GetTime();
@@ -143,21 +157,26 @@ void MainTask(void * pvParameters) {
 			error_pos[i] = pos_d[i] - pos[i];
 			kp_c[i] = kp * error_pos[i];
 			kd_c[i] = kd * (error_pos[i] - error_pos_l[i]) / dt;
-			ki_c[i] = 0;
+			ki_c[i] = ki_c[i] + ki * error_pos[i] * dt;
 			output[i] = kp_c[i] + kd_c[i] + ki_c[i];
+
 //			NANOTECS[i].SetTorque(output[i]);
 			switch (i) {
 			case 0:
-				motor1->SetTorque(output[i]);
+				motor1->SetTorque(output[i]/10.0f);
+//				motor1->SetTorque(0.0f);
 				break;
 			case 1:
-				motor2->SetTorque(output[i]);
+				motor2->SetTorque(output[i]/10.0f);
+//				motor2->SetTorque(0.0f);
 				break;
 			case 2:
-				motor3->SetTorque(output[i]);
+				motor3->SetTorque(output[i]/10.0f);
+//				motor3->SetTorque(0.0f);
 				break;
 			}
 		}
+/////		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
 	}
 }
 

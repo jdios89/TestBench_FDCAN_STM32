@@ -293,7 +293,7 @@ bool NANOTEC_CANOpen::readRegister(uint8_t nodeid, uint16_t register_index,
                                    uint8_t subindex, int32_t *data)
 {
     readRequest(nodeid, register_index, subindex);
-    uint32_t timeout = 2; // 2 ms timeout
+    uint32_t timeout = 10; // 2 ms timeout
     bool read_confirmed = false;
     read_confirmed = waitReply(nodeid, register_index, subindex, timeout, data);
     return read_confirmed;

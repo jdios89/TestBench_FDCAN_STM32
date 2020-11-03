@@ -31,6 +31,7 @@ TIM_HandleTypeDef        htim16;
 /* Private functions ---------------------------------------------------------*/
 static __IO uint32_t uwTickHighRes;
 static uint32_t frequency;
+
 /**
   * @brief  This function configures the TIM16 as a time base source.
   *         The time source is configured  to have 1ms time base with a dedicated
@@ -59,12 +60,19 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 
   /* Compute TIM16 clock */
   uwTimclock = HAL_RCC_GetPCLK2Freq();
+  /* Begin Thomas changed code */
+  uwTimclock = 2*HAL_RCC_GetPCLK2Freq();
 
-  frequency = 10000; // 10 Khz
+  frequency = 10000; // 10 kHz
+  /* End Thomas changed code */
+
+
   /* Compute the prescaler value to have TIM16 counter clock equal to 1MHz */
   uwPrescalerValue = (uint32_t) ((uwTimclock / 1000000) - 1);
-  /* Compute the prescaler value to have TIM16 counter clock equal to 10 kHz */
+  /* Begin Thomas changed code */
   uwPrescalerValue = (uint32_t) ((uwTimclock / frequency) - 1);
+  /* End Thomas changed code */
+
   /* Initialize TIM16 */
   htim16.Instance = TIM16;
 
@@ -87,6 +95,13 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   /* Return function status */
   return HAL_ERROR;
 }
+/* Begin Thomas changed code */
+uint32_t HAL_GetTickTimerValue(void)
+{
+	return (uint32_t)__HAL_TIM_GET_COUNTER(&htim16);
+}
+/* End Thomas changed code */
+
 
 /**
   * @brief  Suspend Tick increment.
@@ -94,12 +109,6 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   * @param  None
   * @retval None
   */
-
-uint32_t HAL_GetTickTimerValue(void)
-{
-	return (uint32_t)__HAL_TIM_GET_COUNTER(&htim16);
-}
-
 void HAL_SuspendTick(void)
 {
   /* Disable TIM16 update Interrupt */
@@ -117,36 +126,21 @@ void HAL_ResumeTick(void)
   /* Enable TIM16 Update interrupt */
   __HAL_TIM_ENABLE_IT(&htim16, TIM_IT_UPDATE);
 }
-
+/*  ALready in interrupt vector
 void TIM16_IRQHandler(void)
 {
   HAL_TIM_IRQHandler(&htim16);
 }
-
-/**
-  * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when TIM16 interrupt took place, inside
-  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
-  * a global variable "uwTick" used as application time base.
-  * @param  htim : TIM handle
-  * @retval None
-  */
+*/
+/* Already in main
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   if (htim->Instance == TIM16) {
     HAL_IncTick();
   }
 }
+*/
 
-/**
-  * @brief This function is called to increment  a global variable "uwTick"
-  *        used as application time base.
-  * @note In the default implementation, this variable is incremented each 1ms
-  *       in Systick ISR.
- * @note This function is declared as __weak to be overwritten in case of other
-  *      implementations in user file.
-  * @retval None
-  */
 void HAL_IncTick(void)
 {
 	uwTickHighRes += 10000; // timer update rate configured 1 Hz but with timer count frequency running at 10 kHz
@@ -221,4 +215,5 @@ uint32_t HAL_GetTick(void)
 {
   return (uwTickHighRes / 10); // divide by 10 since we have configured HAL timer to run at 10 kHz in stm32h7xx_hal_timebase_tim.c
 }
+
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

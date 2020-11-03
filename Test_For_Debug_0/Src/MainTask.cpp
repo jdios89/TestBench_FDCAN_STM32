@@ -79,6 +79,7 @@ void MainTask(void * pvParameters) {
 	uint32_t prevTimerValue; // used for measuring dt
 	float timestamp, dt_compute, dt_compute2;
 	float SampleRate = 120; // can improve
+	SampleRate = 100;
 //  SampleRate = 40;
 	/* Controller loop time / sample rate */
 	TickType_t loopWaitTicks = configTICK_RATE_HZ / SampleRate;

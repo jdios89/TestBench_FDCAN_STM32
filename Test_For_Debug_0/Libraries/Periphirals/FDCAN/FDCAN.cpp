@@ -146,10 +146,10 @@ void FDCAN::InitPeripheral() {
 			;
 
 			/* NVIC for FDCAN */
-			HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, 5, 0);
+			HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, 4, 0);
 			HAL_NVIC_EnableIRQ(FDCAN1_IT0_IRQn);
 			/* Try with line 1 too */
-			HAL_NVIC_SetPriority(FDCAN1_IT0_IRQn, 5, 0);
+			HAL_NVIC_SetPriority(FDCAN1_IT1_IRQn, 4, 0);
 			HAL_NVIC_EnableIRQ(FDCAN1_IT1_IRQn);
 		}
 	}

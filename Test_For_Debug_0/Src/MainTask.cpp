@@ -79,7 +79,7 @@ void MainTask(void * pvParameters) {
 	uint32_t prevTimerValue; // used for measuring dt
 	float timestamp, dt_compute, dt_compute2;
 	float SampleRate = 120; // can improve
-
+//  SampleRate = 40;
 	/* Controller loop time / sample rate */
 	TickType_t loopWaitTicks = configTICK_RATE_HZ / SampleRate;
 	/* Main control loop */
@@ -94,9 +94,10 @@ void MainTask(void * pvParameters) {
 	float kp_c[3] = { 0.0f, 0.0f, 0.0f };
 	float kd_c[3] = { 0.0f, 0.0f, 0.0f };
 	float ki_c[3] = { 0.0f, 0.0f, 0.0f };
-	float kp = 0.08;
-	float kd = 0.0; // 0.2;
-	float ki = 0.0;
+	float kp = 0.15;
+//	kp = 0.16;
+	float kd = 0.00; // 0.2;
+	float ki = 0.02;
 //	float dt = 0.004;
 
 	/*
@@ -110,7 +111,12 @@ void MainTask(void * pvParameters) {
 		/* Wait until time has been reached to make control loop periodic */
 		vTaskDelayUntil(&xLastWakeTime, loopWaitTicks);
 		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
-
+    /* Testing times of osDelay(1) */
+//		for(int i = 0; i < 5; i++) {
+//			HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
+//			osDelay(1);
+//		}
+		/* FInish the testing of times of osDelay(1) */
 ///		osDelay(1);
 ///		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
 //		osDelay(3);
@@ -119,38 +125,37 @@ void MainTask(void * pvParameters) {
 		float freq[3] = { 0.23, 0.5, 1.0 };
 		for (int i = 0; i < 3; i++) {
 			float PI = 3.14159265;
-			float time_ms_ = (float) HAL_GetTick(); //uint32_t
-			pos_d[i] = amplitude[i] * sinf(2.0f * PI * freq[i] * time_ms_ / 1000.0f);
+			float time_us_ = (float) HAL_GetTick(); //uint32_t
+			/* Manual adjustment, measured with oscilloscope */
+			float d_adjs = 0.000000373684f;
+//			time_us_ /= 10000.0f;
+//			time_us_ *= 0.5f;
+			float sinarg = 2.0f * PI * freq[i] * time_us_ * d_adjs;
+			pos_d[i] = amplitude[i] * sinf(sinarg);
 		}
-		for (int i = 0; i < 3; i++){
-			pos_d[i] = 0.0;
-		}
+//		for (int i = 0; i < 3; i++)  pos_d[i] = 0.0;
 		// Control computation
+		float dt = microsTimer->GetDeltaTime(prevTimerValue);
+		/* Manual adjustment to dt */
+		dt /= 100.0f;  // 1.79 = 0.0179 seconds
+		prevTimerValue = microsTimer->Get();
+
 		for (int i = 0; i < 3; i++) {
 			pos_l[i] = pos[i];
 			switch (i) {
 			case 0:
-		//		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
 				pos[i] = motor1->GetAngle();
-			//	HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
 				break;
 			case 1:
-			//	HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
 				pos[i] = motor2->GetAngle();
-		//		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
 				break;
 			case 2:
-		//		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
 				pos[i] = motor3->GetAngle();
-		//		HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_1);
 				break;
 			}
 
-//			uint32_t timerPrev = HAL_tic();
 			volatile float posv[3] = {0.0, 0.0, 0.0};
 			for (int i = 0; i < 3; i++) posv[i] = pos[i];
-			float dt = microsTimer->GetDeltaTime(prevTimerValue);
-			prevTimerValue = microsTimer->Get();
 			timestamp = microsTimer->GetTime();
 //			pos[i] = NANOTECS[i].GetAngle();
 			error_pos_l[i] = error_pos[i];
@@ -163,15 +168,15 @@ void MainTask(void * pvParameters) {
 //			NANOTECS[i].SetTorque(output[i]);
 			switch (i) {
 			case 0:
-				motor1->SetTorque(output[i]/10.0f);
+				motor1->SetTorque(output[i]);
 //				motor1->SetTorque(0.0f);
 				break;
 			case 1:
-				motor2->SetTorque(output[i]/10.0f);
+				motor2->SetTorque(output[i]);
 //				motor2->SetTorque(0.0f);
 				break;
 			case 2:
-				motor3->SetTorque(output[i]/10.0f);
+				motor3->SetTorque(output[i]);
 //				motor3->SetTorque(0.0f);
 				break;
 			}

@@ -91,7 +91,7 @@ void MainTask(void * pvParameters) {
 	float pos_l[3] = { 0.0f, 0.0f, 0.0f };
 	float pos_ll[3] = { 0.0f, 0.0f, 0.0f };
 	float vel[3] = { 0.0f, 0.0f, 0.0f };
-	float vel_d[3] = { 10.0f, 10.0f, 10.0f };
+	float vel_d[3] = { 1.0f, 5.0f, 10.0f };
 	float error_pos[3] = { 0.0f, 0.0f, 0.0f };
 	float error_vel[3] = { 0.0f, 0.0f, 0.0f };
 	float error_pos_l[3] = { 0.0f, 0.0f, 0.0f };
@@ -106,8 +106,8 @@ void MainTask(void * pvParameters) {
 	float kd = 0.000002; // 0.2;
 	float ki = 0.12;
 	/* Velocity gains */
-	float kp_v = 0.01;
-	float ki_v = 0.00;
+	float kp_v = 0.016;
+	float ki_v = 0.006;
 //	float dt = 0.004;
 
 	/*
@@ -116,6 +116,24 @@ void MainTask(void * pvParameters) {
 	 osDelay(348);
 	 }
 	 */
+	/* FIll in the blank values */
+	for (int j = 0; j < 4; j++) {
+		for (int i = 0; i < 3; i++) {
+			pos_ll[i] = pos_l[i];
+			pos_l[i] = pos[i];
+			switch (i) {
+			case 0:
+				pos[i] = motor1->GetAngle();
+				break;
+			case 1:
+				pos[i] = motor2->GetAngle();
+				break;
+			case 2:
+				pos[i] = motor3->GetAngle();
+				break;
+			}
+		}
+	}
 	// Compute control
 	float time_inc = 0.0f;
 	while (1) {

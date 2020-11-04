@@ -82,6 +82,7 @@ void LED_Display(uint8_t LedStatus);
   * @retval int
   */
 int main(void)
+
 {
   /* USER CODE BEGIN 1 */
 
@@ -125,11 +126,11 @@ int main(void)
 //	MainTask(1);
 	for (int i = 0; i < 5; i++) {
 		LED_Display(0);
-		HAL_Delay(2000);
+		HAL_Delay(500);
 		LED_Display(1);
-		HAL_Delay(2000);
+		HAL_Delay(500);
 		LED_Display(2);
-		HAL_Delay(2000);
+		HAL_Delay(500);
 	}
 	BSP_LED_Off(2);
 //	MainTask(1);

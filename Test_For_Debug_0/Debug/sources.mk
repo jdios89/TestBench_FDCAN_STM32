@@ -27,6 +27,8 @@ CPP_DEPS :=
 SUBDIRS := \
 Drivers/STM32H7xx_HAL_Driver/Src \
 Libraries/Devices/NANOTEC \
+Libraries/Modules/Estimators/Kinematics_tilted \
+Libraries/Modules/Estimators/Kinematics_tilted/examples \
 Libraries/Periphirals/FDCAN \
 Libraries/Periphirals/Timer \
 Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS \

@@ -82,7 +82,6 @@ void LED_Display(uint8_t LedStatus);
   * @retval int
   */
 int main(void)
-
 {
   /* USER CODE BEGIN 1 */
 

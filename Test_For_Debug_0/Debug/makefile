@@ -16,6 +16,8 @@ RM := rm -rf
 -include Middlewares/Third_Party/FreeRTOS/Source/subdir.mk
 -include Libraries/Periphirals/Timer/subdir.mk
 -include Libraries/Periphirals/FDCAN/subdir.mk
+-include Libraries/Modules/Estimators/Kinematics_tilted/examples/subdir.mk
+-include Libraries/Modules/Estimators/Kinematics_tilted/subdir.mk
 -include Libraries/Devices/NANOTEC/subdir.mk
 -include Drivers/STM32H7xx_HAL_Driver/Src/subdir.mk
 -include subdir.mk

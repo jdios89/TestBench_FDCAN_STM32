@@ -25,6 +25,10 @@
 #include "Timer.h"
 //#include "PD4Cxx08.h"
 //#include "CAN_CMD.h"
+#include "InverseKinematics_tilt.h"
+#include "InverseKinematics_tilt_terminate.h"
+#include "InverseKinematics_tilt_initialize.h"
+
 #include "NANOTEC_Bus.h" // Communication library
 #include "NANOTEC.h" // Motor specific library
 
@@ -74,6 +78,15 @@ void MainTask(void * pvParameters) {
 	/* Initialize microseconds timer */
 	Timer * microsTimer = new Timer(Timer::TIMER6, 1000000); // create a 1 MHz counting timer used for micros() timing
 
+	/* For the generated library */
+	float dpsi[3]; // Wheels velocity
+  float dq1, dq2, dq3,dq4, dx, dy, q1, q2, q3, q4;
+  dq1 = 0.0; dq2 = 0.0; dq3 = 0.0; dq4 = 0.0; q1 = 1.0; q2 = 0.0; q3 = 0.0; q4 = 0.0;
+  float rk = 0.129f; // ball radius
+  float rw = 0.05f; // wheel radius
+  dx = 0.0; // velocity x
+  dy = 0.5; // velocity y
+
 	/* Control variables */
 	TickType_t xLastWakeTime;
 	uint32_t prevTimerValue; // used for measuring dt
@@ -108,7 +121,9 @@ void MainTask(void * pvParameters) {
 	/* Velocity gains */
 	float kp_v = 0.016;
 	float ki_v = 0.006;
-//	float dt = 0.004;
+	kp_v = 0.051;
+	ki_v = 0.01;
+	//	float dt = 0.004;
 
 	/*
 	 while (1) {
@@ -166,6 +181,10 @@ void MainTask(void * pvParameters) {
 			sinarg = 2.0f * PI * freq[i] * microsTimer->GetTime();
 			pos_d[i] = amplitude[i] * sinf(sinarg);
 		}
+		// Reference generator velocity
+		InverseKinematics_tilt(dq1, dq2, dq3, dq4, dx, dy, q1, q2, q3, q4, rk, rw,
+				dpsi);
+		for (int i = 0; i < 3; i++)  vel_d[i] = dpsi[i];
 //		for (int i = 0; i < 3; i++)  pos_d[i] = 0.0;
 		// Control computation
 		float dt = microsTimer->GetDeltaTime(prevTimerValue);

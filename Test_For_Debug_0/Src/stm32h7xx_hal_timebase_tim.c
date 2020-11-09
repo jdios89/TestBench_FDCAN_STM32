@@ -59,21 +59,19 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   HAL_RCC_GetClockConfig(&clkconfig, &pFLatency);
 
   /* Compute TIM16 clock */
-  uwTimclock = HAL_RCC_GetPCLK2Freq();
-  /* Begin Thomas changed code */
   uwTimclock = 2*HAL_RCC_GetPCLK2Freq();
+	/* Begin Thomas changed code */
+	uwTimclock = 2 * HAL_RCC_GetPCLK2Freq();
 
-  frequency = 10000; // 10 kHz
-  /* End Thomas changed code */
-
+	frequency = 10000; // 10 kHz
+	/* End Thomas changed code */
 
   /* Compute the prescaler value to have TIM16 counter clock equal to 1MHz */
   uwPrescalerValue = (uint32_t) ((uwTimclock / 1000000) - 1);
-  /* Begin Thomas changed code */
-  uwPrescalerValue = (uint32_t) ((uwTimclock / frequency) - 1);
-  /* End Thomas changed code */
-
-  /* Initialize TIM16 */
+	/* Begin Thomas changed code */
+	uwPrescalerValue = (uint32_t) ((uwTimclock / frequency) - 1);
+   /* End Thomas changed code */
+	 /* Initialize TIM16 */
   htim16.Instance = TIM16;
 
   /* Initialize TIMx peripheral as follow:
@@ -95,13 +93,6 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
   /* Return function status */
   return HAL_ERROR;
 }
-/* Begin Thomas changed code */
-uint32_t HAL_GetTickTimerValue(void)
-{
-	return (uint32_t)__HAL_TIM_GET_COUNTER(&htim16);
-}
-/* End Thomas changed code */
-
 
 /**
   * @brief  Suspend Tick increment.
@@ -126,21 +117,11 @@ void HAL_ResumeTick(void)
   /* Enable TIM16 Update interrupt */
   __HAL_TIM_ENABLE_IT(&htim16, TIM_IT_UPDATE);
 }
-/*  ALready in interrupt vector
-void TIM16_IRQHandler(void)
+/* Begin Thomas changed code */
+uint32_t HAL_GetTickTimerValue(void)
 {
-  HAL_TIM_IRQHandler(&htim16);
+	return (uint32_t)__HAL_TIM_GET_COUNTER(&htim16);
 }
-*/
-/* Already in main
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-  if (htim->Instance == TIM16) {
-    HAL_IncTick();
-  }
-}
-*/
-
 void HAL_IncTick(void)
 {
 	uwTickHighRes += 10000; // timer update rate configured 1 Hz but with timer count frequency running at 10 kHz
@@ -215,5 +196,6 @@ uint32_t HAL_GetTick(void)
 {
   return (uwTickHighRes / 10); // divide by 10 since we have configured HAL timer to run at 10 kHz in stm32h7xx_hal_timebase_tim.c
 }
+/* End Thomas changed code */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

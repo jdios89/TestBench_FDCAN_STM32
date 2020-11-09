@@ -229,11 +229,17 @@ void FDCAN::ConfigurePeripheral() {
 		_hRes->handle.Init.NominalTimeSeg2 = 0x8; //1; //1;
 
 		/* for 60 Mhz example STM */
+		/* THIS IS TOTALLY WORKING WHEN 60 MHZ */
 		_hRes->handle.Init.NominalPrescaler = 5;
 		_hRes->handle.Init.NominalSyncJumpWidth = 7;
 		_hRes->handle.Init.NominalTimeSeg1 = 10; //8; //6;
 		_hRes->handle.Init.NominalTimeSeg2 = 1; //1; //1;
 
+		/* THIS IS CHANGED TO WORK WITH 80 MHZ*/
+		_hRes->handle.Init.NominalPrescaler = 8;
+		_hRes->handle.Init.NominalSyncJumpWidth = 7;
+		_hRes->handle.Init.NominalTimeSeg1 = 8; //8; //6;
+		_hRes->handle.Init.NominalTimeSeg2 = 1; //1; //1;
 //		_hRes->handle.Init.DataPrescaler = 1;
 //		_hRes->handle.Init.DataSyncJumpWidth = 29;
 //		_hRes->handle.Init.DataTimeSeg1 = 20; // 6

@@ -84,8 +84,8 @@ void MainTask(void * pvParameters) {
   dq1 = 0.0; dq2 = 0.0; dq3 = 0.0; dq4 = 0.0; q1 = 1.0; q2 = 0.0; q3 = 0.0; q4 = 0.0;
   float rk = 0.129f; // ball radius
   float rw = 0.05f; // wheel radius
-  dx = 0.5; // velocity x
-  dy = 0.0; // velocity y
+  dx = 0.0; // velocity x
+  dy = 0.5; // velocity y
 
 	/* Control variables */
 	TickType_t xLastWakeTime;

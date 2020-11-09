@@ -33,7 +33,7 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stm32h7xx_nucleo_144.h"
- #include "stm32h7xx_hal_timebase_tim.h"
+#include "stm32h7xx_hal_timebase_tim.h"
 
 /* USER CODE END Includes */
 

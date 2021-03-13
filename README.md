@@ -15,7 +15,9 @@ The board used for developing this library is [Nucleo STM32H743ZI2](https://www.
 
 ## Libraries 
  
-Some libraries are included from [Kugle embedded](https://github.com/mindThomas/Kugle-Embedded). 
+The following library are included from [Kugle embedded](https://github.com/mindThomas/Kugle-Embedded). 
+
+- Timer
 
 ## FDCAN - STANDARD CAN Library 
 
@@ -28,5 +30,9 @@ The FDCAN library can be located in the libraries folder and it comprises three 
 
 ![Screenshot](PD4.jpg)<br/>
 
- 
+## Kinematics for the motor configuration 
+
+The kinematics library located in the Estimators folder is auto generated using MATLAB. 
+
+It is based on tilting the motors on that are on top of the ball. 
 

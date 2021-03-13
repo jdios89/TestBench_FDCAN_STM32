@@ -53,7 +53,7 @@ void MainTask(void * pvParameters) {
 	 */
 
 	float d = 2;
-//	FDCAN fdcantest2; // port object
+	FDCAN fdcantest2; // port object
 	FDCAN * fdcantest = new FDCAN(); // port object
 
 	NANOTEC * motor1 = new NANOTEC(fdcantest, (uint8_t) 0x1, 2.0f, 3.54f / 4.2f,
